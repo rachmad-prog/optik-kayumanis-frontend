@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F5EDE3;
+  color: #2A2622;
+}
+
+/* Hero carousel fade transition */
+.fade-slide {
+  transition: opacity 0.7s ease;
+}
+
+/* Trust marquee, infinite scrolling strip */
+.marquee-track {
+  animation: marquee 22s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Katalog filter buttons */
+.filter-btn.active {
+  background-color: #8B5E3C;
+  color: #FFFCF8;
+  border-color: #8B5E3C;
+}
+
+/* Signature: cinnamon-curl divider used between sections, echoing a rolled cinnamon stick */
+.curl-divider {
+  position: relative;
+  height: 48px;
+  width: 100%;
+  overflow: hidden;
+}
+.curl-divider svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Wood-label price tag corner, used on product cards */
+.price-tag {
+  clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 30%);
+}
+
+/* Visible focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid #8B5E3C;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
