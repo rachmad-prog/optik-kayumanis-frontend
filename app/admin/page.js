@@ -50,7 +50,7 @@ export default function AdminDashboard() {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/api/license/activate",
+        "https://optik-kayumanis-backend.vercel.app/api/license/activate",
         {
           method: "POST",
           // Tambahkan Authorization header agar backend tahu ini request dari DIREKTUR yang sah
