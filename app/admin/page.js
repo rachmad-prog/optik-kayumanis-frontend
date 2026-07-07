@@ -3,20 +3,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { api, formatRupiah } from "../../lib/api";
+import LicenseModal from "../../components/LicenseModal";
 
 export default function AdminDashboard() {
   // 1. Ambil data 'user' dariuseAuth() untuk mengecek role login
   const { token, user } = useAuth();
   const [stats, setStats] = useState(null);
-  const [isBlocked, setIsBlocked] = useState(false);
 
-  // State untuk Modal Lisensi
+  // State untuk Modal Lisensi (dipakai kalau /admin/stats gagal karena bukan admin/direktur yang sah,
+  // meskipun secara normal ADMIN/DIREKTUR selalu lolos checkLicense di backend)
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tokenInput, setTokenInput] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [durationInput, setDurationInput] = useState(""); // State untuk input tanggal & jam
 
   // State untuk Modal Edit Stok
   const [editingStockProduct, setEditingStockProduct] = useState(null); // { id, name, stock }
@@ -28,60 +24,10 @@ export default function AdminDashboard() {
     if (token) {
       api
         .get("/admin/stats", token)
-        .then((data) => {
-          setStats(data);
-          setIsBlocked(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          // Jika backend melempar 403/error lisensi, set status terblokir
-          setIsBlocked(true);
-        });
+        .then((data) => setStats(data))
+        .catch((err) => console.error(err));
     }
   }, [token]);
-
-  const handleActivateLicense = async () => {
-    if (!tokenInput.trim() || !durationInput) {
-      setErrorMessage("Token dan Batas Waktu Lisensi harus diisi!");
-      return;
-    }
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const response = await fetch(
-        "https://optik-kayumanis-backend.vercel.app/api/license/activate",
-        {
-          method: "POST",
-          // Tambahkan Authorization header agar backend tahu ini request dari DIREKTUR yang sah
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            inputToken: tokenInput,
-            customExpiredAt: durationInput, // Mengirim tanggal & jam pilihan ke backend
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        alert("🎉 " + data.message);
-        setIsModalOpen(false);
-        setTokenInput("");
-        setDurationInput("");
-        window.location.reload();
-      } else {
-        setErrorMessage(data.message || "Token salah atau tidak valid.");
-      }
-    } catch (error) {
-      setErrorMessage("Gagal terhubung ke server backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openEditStock = (product) => {
     setEditingStockProduct(product);
@@ -157,33 +103,8 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Kondisi Konten Utama */}
-      {isBlocked ? (
-        // Tampilan khusus kalau lisensi backend sedang mati/memblokir akses
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6 text-center my-10 max-w-xl mx-auto">
-          <p className="font-semibold text-base mb-1">
-            ⚠️ Akses Sistem Terbatas
-          </p>
-          <p className="text-sm text-red-600/90 mb-4">
-            Masa aktif lisensi website Anda kemungkinan telah habis atau token
-            belum dikonfigurasi dengan benar di server backend.
-          </p>
-
-          {/* 🔥 GERBANG KONDISI: Kotak input token hanya ditawarkan ke DIREKTUR, Admin dipersilakan menghubungi pimpinan */}
-          {user?.role === "DIREKTUR" ? (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-semibold hover:bg-red-700 transition-colors shadow-sm">
-              Masukkan Token Aktivasi Sekarang
-            </button>
-          ) : (
-            <p className="text-xs bg-white text-bark-400 p-2.5 rounded-xl border border-red-100 italic">
-              Harap hubungi Direktur Utama untuk melakukan perpanjangan lisensi
-              operasional sistem.
-            </p>
-          )}
-        </div>
-      ) : !stats ? (
+      {/* Kondisi Konten Utama — peringatan lisensi habis sudah ditangani LicenseBanner di admin/layout.js */}
+      {!stats ? (
         // Tampilan loading standar sebelum data ditarik
         <p className="text-bark-300 text-sm">Memuat statistik...</p>
       ) : (
@@ -266,68 +187,13 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* MODAL INPUT TOKEN (Hanya direktur yang bisa membuka modal ini) */}
-      {isModalOpen && user?.role === "DIREKTUR" && (
-        <div className="fixed inset-0 bg-bark-700/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-sand text-bark-700">
-            <h3 className="text-lg font-display font-semibold mb-1">
-              Aktivasi Lisensi Website
-            </h3>
-            <p className="text-xs text-bark-300 mb-4">
-              Masukkan kode token rahasia untuk memperbarui atau memperpanjang
-              masa aktif operasional website.
-            </p>
-
-            {/* INPUT TOKEN */}
-            <input
-              type="text"
-              placeholder="Masukkan token keamanan..."
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              className="w-full p-2.5 border border-sand rounded-xl mb-2 text-sm focus:outline-none focus:border-cinnamon-600 bg-sand/20 font-mono text-xs text-bark-600"
-              disabled={loading}
-            />
-
-            {/* INPUT PILIHAN TANGGAL DAN WAKTU */}
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-bark-500 mb-1">
-                Tentukan Batas Waktu Aktif Website:
-              </label>
-              <input
-                type="datetime-local"
-                value={durationInput}
-                onChange={(e) => setDurationInput(e.target.value)}
-                className="w-full p-2.5 border border-sand rounded-xl text-sm focus:outline-none focus:border-cinnamon-600 bg-sand/20 text-bark-600"
-                disabled={loading}
-              />
-            </div>
-
-            {errorMessage && (
-              <p className="text-xs font-medium text-red-600 mb-3 bg-red-50 p-2 rounded-xl">
-                ⚠️ {errorMessage}
-              </p>
-            )}
-
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setErrorMessage("");
-                }}
-                className="px-4 py-2 text-bark-500 rounded-xl text-sm font-medium hover:bg-sand/30 transition-colors"
-                disabled={loading}>
-                Batal
-              </button>
-              <button
-                onClick={handleActivateLicense}
-                className="px-4 py-2 bg-cinnamon-600 text-white rounded-xl text-sm font-medium hover:bg-cinnamon-700 transition-colors disabled:bg-cinnamon-300"
-                disabled={loading || !tokenInput.trim()}>
-                {loading ? "Memproses..." : "Perbarui Lisensi"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* MODAL LISENSI (komponen bersama, sama dengan yang ada di admin/layout.js) */}
+      <LicenseModal
+        open={isModalOpen && user?.role === "DIREKTUR"}
+        onClose={() => setIsModalOpen(false)}
+        token={token}
+        onSuccess={() => window.location.reload()}
+      />
 
       {/* MODAL EDIT STOK */}
       {editingStockProduct && (

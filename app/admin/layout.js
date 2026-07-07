@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../lib/api"; // Ganti dengan path folder lib/api lo jika berbeda
+import LicenseModal from "../../components/LicenseModal";
+import LicenseBanner from "../../components/LicenseBanner";
 
 const links = [
   { href: "/admin", label: "Dashboard" },
@@ -21,10 +22,7 @@ export default function AdminLayout({ children }) {
 
   // State untuk modal lisensi direktur
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tokenInput, setTokenInput] = useState("");
-  const [durationInput, setDurationInput] = useState("");
-  const [btnLoading, setBtnLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [bannerKey, setBannerKey] = useState(0); // dipakai untuk refresh LicenseBanner setelah update sukses
 
   useEffect(() => {
     // 🔑 IZINKAN ADMIN DAN DIREKTUR MASUK
@@ -34,35 +32,6 @@ export default function AdminLayout({ children }) {
       }
     }
   }, [user, loading, router]);
-
-  // Handler Aktivasi Lisensi oleh Direktur
-  const handleActivateLicense = async () => {
-    setBtnLoading(true);
-    setErrorMessage("");
-    try {
-      const res = await api.post(
-        "/license/activate",
-        {
-          inputToken: tokenInput,
-          customExpiredAt: durationInput,
-        },
-        token,
-      ); // Mengirimkan Bearer token login direktur
-
-      alert(res.message || "Lisensi sistem berhasil diperbarui!");
-      setIsModalOpen(false);
-      setTokenInput("");
-      setDurationInput("");
-    } catch (err) {
-      setErrorMessage(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Gagal memperbarui lisensi.",
-      );
-    } finally {
-      setBtnLoading(false);
-    }
-  };
 
   if (loading || !user || (user.role !== "ADMIN" && user.role !== "DIREKTUR"))
     return null;
@@ -94,93 +63,28 @@ export default function AdminLayout({ children }) {
             <button
               onClick={() => setIsModalOpen(true)}
               className="w-full text-left px-4 py-2.5 bg-cinnamon-600 hover:bg-cinnamon-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2">
-              <span>🔑</span> Lisensi & Token JWT
+              <span>🔑</span> Lisensi Sistem
             </button>
           </div>
         )}
       </aside>
 
-      <div>{children}</div>
+      <div>
+        <LicenseBanner
+          key={bannerKey}
+          token={token}
+          role={user.role}
+          onOpenLicenseModal={() => setIsModalOpen(true)}
+        />
+        {children}
+      </div>
 
-      {/* ================= MODAL LISENSI KHUSUS DIREKTUR ================= */}
-      {isModalOpen && user.role === "DIREKTUR" && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-sand text-bark-700">
-            <h3 className="text-lg font-display font-semibold mb-1 text-bark-700">
-              Aktivasi Lisensi Website
-            </h3>
-            <p className="text-xs text-bark-400 mb-4">
-              Panel khusus Direktur untuk memantau token otentikasi dan
-              memperpanjang masa aktif web.
-            </p>
-
-            {/* PANEL INFO TOKEN AKTIF */}
-            <div className="mb-4 bg-gray-50 border border-sand p-3 rounded-xl">
-              <label className="block text-[10px] uppercase font-bold tracking-wide text-bark-500 mb-1">
-                🔑 Token JWT Aktif Direktur:
-              </label>
-              <div
-                className="bg-white border border-sand/60 p-2 rounded-lg font-mono text-[10px] text-bark-600 break-all max-h-20 overflow-y-auto select-all cursor-pointer"
-                title="Klik untuk menyalin">
-                {token}
-              </div>
-            </div>
-
-            {/* INPUT SECURITY TOKEN */}
-            <div className="mb-3">
-              <label className="block text-xs font-medium text-bark-600 mb-1">
-                Masukkan Website Token (.env):
-              </label>
-              <input
-                type="text"
-                placeholder="Masukkan token keamanan..."
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-                className="w-full p-2.5 border border-sand rounded-xl text-sm focus:outline-none focus:border-cinnamon-600 bg-sand/20 font-mono text-xs text-bark-700"
-                disabled={btnLoading}
-              />
-            </div>
-
-            {/* INPUT PILIHAN TANGGAL KEDALUWARSA */}
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-bark-600 mb-1">
-                Batas Waktu Aktif Website Baru:
-              </label>
-              <input
-                type="datetime-local"
-                value={durationInput}
-                onChange={(e) => setDurationInput(e.target.value)}
-                className="w-full p-2.5 border border-sand rounded-xl text-sm focus:outline-none focus:border-cinnamon-600 bg-sand/20 text-bark-700"
-                disabled={btnLoading}
-              />
-            </div>
-
-            {errorMessage && (
-              <p className="text-xs font-medium text-red-600 mb-3 bg-red-50 p-2 rounded-xl">
-                ⚠️ {errorMessage}
-              </p>
-            )}
-
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setErrorMessage("");
-                }}
-                className="px-4 py-2 text-bark-500 rounded-xl text-sm font-medium hover:bg-sand/30 transition-colors"
-                disabled={btnLoading}>
-                Batal
-              </button>
-              <button
-                onClick={handleActivateLicense}
-                className="px-4 py-2 bg-cinnamon-600 text-white rounded-xl text-sm font-medium hover:bg-cinnamon-700 transition-colors disabled:bg-cinnamon-300"
-                disabled={btnLoading || !tokenInput.trim() || !durationInput}>
-                {btnLoading ? "Memproses..." : "Perbarui Lisensi"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LicenseModal
+        open={isModalOpen && user.role === "DIREKTUR"}
+        onClose={() => setIsModalOpen(false)}
+        token={token}
+        onSuccess={() => setBannerKey((k) => k + 1)}
+      />
     </div>
   );
 }
