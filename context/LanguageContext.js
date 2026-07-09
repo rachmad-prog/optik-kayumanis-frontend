@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -7,6 +7,11 @@ const STORAGE_KEY = "ok_lang";
 const dictionaries = {
   en: {
     home: "Home",
+    about: "About",
+    services: "Services",
+    branches: "Branches",
+    contact: "Contact",
+    store: "Store",
     catalog: "Product Catalog",
     opticalGlasses: "Optical Glasses",
     contactLenses: "Contact Lenses",
@@ -28,6 +33,11 @@ const dictionaries = {
   },
   id: {
     home: "Home",
+    about: "Tentang",
+    services: "Layanan",
+    branches: "Cabang",
+    contact: "Kontak",
+    store: "Store",
     catalog: "Katalog Produk",
     opticalGlasses: "Kacamata Optik",
     contactLenses: "Lensa Kontak",

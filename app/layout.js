@@ -16,6 +16,9 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Optik Kayumanis — Kacamata & Lensa Kontak Premium",
   description:

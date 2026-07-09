@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -6,11 +6,18 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 
-const navLinks = [
+const mainNavLinks = [
   { href: "/", key: "home" },
-  { href: "/shop", key: "catalog" },
-  { href: "/shop?category=kacamata-optik", key: "opticalGlasses" },
-  { href: "/shop?category=lensa-kontak", key: "contactLenses" },
+  { href: "/#tentang", key: "about" },
+  { href: "/#layanan", key: "services" },
+  { href: "/#cabang", key: "branches" },
+  { href: "/#kontak", key: "contact" },
+];
+
+const storeLinks = [
+  { href: "/store", key: "catalog" },
+  { href: "/store?category=kacamata-optik", key: "opticalGlasses" },
+  { href: "/store?category=lensa-kontak", key: "contactLenses" },
 ];
 
 function CartIcon(props) {
@@ -48,6 +55,24 @@ function GlobeIcon(props) {
       {...props}>
       <circle cx="12" cy="12" r="9" />
       <path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon(props) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width="14"
+      height="14"
+      aria-hidden="true"
+      {...props}>
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
@@ -97,8 +122,8 @@ export default function Navbar({ content }) {
             </span>
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-8 text-sm font-medium text-charcoal">
-            {navLinks.map((link) => (
+          <ul className="hidden lg:flex items-center gap-7 text-sm font-medium text-charcoal">
+            {mainNavLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
@@ -107,6 +132,27 @@ export default function Navbar({ content }) {
                 </Link>
               </li>
             ))}
+            <li className="relative group">
+              <Link
+                href="/store"
+                className="inline-flex items-center gap-1.5 hover:text-cinnamon transition-colors">
+                {t("store")}
+                {/* <ChevronDownIcon /> */}
+              </Link>
+              {/* <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 absolute right-0 top-full pt-4 transition">
+                <ul className="w-52 rounded-xl border border-beige bg-cream shadow-xl p-2 text-sm">
+                  {storeLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="block rounded-lg px-3 py-2 hover:bg-cinnamon/10 hover:text-cinnamon transition-colors">
+                        {t(link.key)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div> */}
+            </li>
           </ul>
 
           <div className="hidden lg:flex items-center gap-3">
@@ -130,7 +176,6 @@ export default function Navbar({ content }) {
                   {t("hi")}, {user.name.split(" ")[0]}
                 </Link>
 
-                {/* 🔑 1. AKSES DESKTOP: Izinkan Admin atau Direktur melihat tombol panel */}
                 {(user.role === "ADMIN" || user.role === "DIREKTUR") && (
                   <Link
                     href="/admin"
@@ -177,7 +222,7 @@ export default function Navbar({ content }) {
         {open && (
           <div className="lg:hidden border-t border-beige bg-cream px-5 pb-4">
             <ul className="flex flex-col gap-1 pt-2 text-sm font-medium text-charcoal">
-              {navLinks.map((link) => (
+              {mainNavLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -187,6 +232,26 @@ export default function Navbar({ content }) {
                   </Link>
                 </li>
               ))}
+              <li className="pt-2">
+                <Link
+                  href="/store"
+                  className="block py-2 font-bold text-charcoal"
+                  onClick={() => setOpen(false)}>
+                  {t("store")}
+                </Link>
+                <ul className="pl-4 border-l border-beige">
+                  {storeLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="block py-2 text-warmgray"
+                        onClick={() => setOpen(false)}>
+                        {t(link.key)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
               <li>
                 <Link
                   href="/cart"
@@ -206,7 +271,6 @@ export default function Navbar({ content }) {
                     </Link>
                   </li>
 
-                  {/* 🔑 2. AKSES MOBILE: Izinkan Admin atau Direktur melihat tombol panel */}
                   {(user.role === "ADMIN" || user.role === "DIREKTUR") && (
                     <li>
                       <Link

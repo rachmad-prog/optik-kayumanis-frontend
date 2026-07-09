@@ -1,43 +1,20 @@
-import Link from "next/link";
-import { api } from "../lib/api";
+﻿import { api } from "../lib/api";
 import HeroCarousel from "../components/HeroCarousel";
-import ProductFilterGrid from "../components/ProductFilterGrid";
+import HomeContentSections from "../components/HomeContentSections";
 import { DEFAULT_CONTENT } from "../lib/defaultContent";
 import { isDirectVideoUrl, isEmbeddableLink, toEmbedUrl } from "../lib/media";
 
-async function getProducts() {
-  try {
-    const data = await api.get("/products?limit=8");
-    return data.items;
-  } catch {
-    return [];
-  }
-}
-
-async function getCategories() {
-  try {
-    const data = await api.get("/categories");
-    return data.items;
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function getSiteContent() {
   try {
     const data = await api.get("/content");
-    return data.content;
+    return { ...DEFAULT_CONTENT, ...data.content };
   } catch {
     return DEFAULT_CONTENT;
   }
 }
-
-const categoryGradients = [
-  "linear-gradient(160deg,#4A2E1E,#8B5E3C)",
-  "linear-gradient(160deg,#A8794F,#E4D8C8)",
-  "linear-gradient(160deg,#6E8B63,#8B5E3C)",
-  "linear-gradient(160deg,#2A2622,#7A756D)",
-];
 
 // Fixed icon set matched to valueProps items by position (title/desc come from CMS)
 const valuePropIcons = [
@@ -54,13 +31,9 @@ const valuePropIcons = [
 ];
 
 export default async function HomePage() {
-  const [products, categories, content] = await Promise.all([
-    getProducts(),
-    getCategories(),
-    getSiteContent(),
-  ]);
+  const content = await getSiteContent();
 
-  const { marquee, valueProps, katalog, layanan, tentang } = content;
+  const { marquee, valueProps, layanan, tentang } = content;
 
   return (
     <>
@@ -73,7 +46,7 @@ export default async function HomePage() {
             <span key={i} className="inline-flex gap-10">
               {marquee.map((item, j) => (
                 <span key={j} className="inline-flex gap-10">
-                  <span>{item}</span><span>•</span>
+                  <span>{item}</span><span>â€¢</span>
                 </span>
               ))}
             </span>
@@ -107,56 +80,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Katalog */}
-      <section id="katalog" className="max-w-7xl mx-auto px-5 md:px-8 py-20">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-          <div>
-            <p className="text-cinnamon font-semibold uppercase tracking-widest text-xs mb-2">{katalog.eyebrow}</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-charcoal">{katalog.title}</h2>
-          </div>
-          <Link href="/shop" className="text-sm font-semibold text-cinnamon hover:underline whitespace-nowrap">
-            {katalog.linkLabel} →
-          </Link>
-        </div>
-
-        {categories.length > 0 && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
-            {categories.map((cat, i) => (
-              <Link
-                key={cat.id}
-                href={`/shop?category=${cat.slug}`}
-                className="group relative rounded-2xl overflow-hidden h-64"
-                style={cat.imageUrl ? undefined : { background: categoryGradients[i % categoryGradients.length] }}
-              >
-                {cat.imageUrl && (
-                  <div
-                    className="absolute inset-0 bg-cover bg-center scale-100 group-hover:scale-105 transition-transform duration-500"
-                    style={{ backgroundImage: `url(${cat.imageUrl})` }}
-                  />
-                )}
-                {cat.imageUrl && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                )}
-                <div className="absolute inset-0 flex flex-col justify-end p-5">
-                  <h3 className="text-cream font-bold text-lg drop-shadow">{cat.name}</h3>
-                  <p className="text-cream/70 text-xs">{cat._count?.products || 0} produk</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {products.length === 0 ? (
-          <p className="text-warmgray text-sm py-10 text-center">
-            Belum ada produk unggulan. Tambahkan produk dari dashboard admin.
-          </p>
-        ) : (
-          <ProductFilterGrid products={products} categories={categories} />
-        )}
-      </section>
-
       {/* Layanan periksa mata */}
-      <section id="layanan" className="bg-cinnamon-700 text-cream">
+      <section id="layanan-periksa-mata" className="bg-cinnamon-700 text-cream">
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-cream/60 font-semibold uppercase tracking-widest text-xs mb-2">{layanan.eyebrow}</p>
@@ -250,6 +175,10 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+    
+      <HomeContentSections content={content} />
     </>
   );
 }
+
+

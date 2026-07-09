@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { DEFAULT_CONTENT } from "../lib/defaultContent";
@@ -61,9 +61,9 @@ export default function Footer({ content }) {
           <p className="font-bold text-cream mb-4">{t("navigation")}</p>
           <ul className="space-y-2 text-sm">
             <li><Link href="/" className="hover:text-cinnamon">{t("home")}</Link></li>
-            <li><Link href="/shop" className="hover:text-cinnamon">{t("catalog")}</Link></li>
-            <li><Link href="/shop?category=kacamata-optik" className="hover:text-cinnamon">{t("opticalGlasses")}</Link></li>
-            <li><Link href="/shop?category=lensa-kontak" className="hover:text-cinnamon">{t("contactLenses")}</Link></li>
+            <li><Link href="/store" className="hover:text-cinnamon">{t("store")}</Link></li>
+            <li><Link href="/store?category=kacamata-optik" className="hover:text-cinnamon">{t("opticalGlasses")}</Link></li>
+            <li><Link href="/store?category=lensa-kontak" className="hover:text-cinnamon">{t("contactLenses")}</Link></li>
           </ul>
         </div>
 
@@ -102,8 +102,12 @@ export default function Footer({ content }) {
         </div>
       </div>
       <div className="border-t border-cream/10 py-5 text-center text-xs text-cream/50">
-        © {new Date().getFullYear()} {footer.copyrightText || `Optik Kayumanis. ${t("allRightsReserved")}`}
+        Â© {new Date().getFullYear()} {footer.copyrightText || `Optik Kayumanis. ${t("allRightsReserved")}`}
       </div>
     </footer>
   );
 }
+
+
+
+
