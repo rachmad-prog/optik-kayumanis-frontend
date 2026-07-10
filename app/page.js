@@ -7,6 +7,18 @@ import { isDirectVideoUrl, isEmbeddableLink, toEmbedUrl } from "../lib/media";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// Builds a wa.me link from a section-specific WhatsApp number + prefilled
+// message, so admins can see exactly which number a CTA button points to
+// instead of it silently reusing the Footer's WA number. Falls back to
+// `fallbackHref` (e.g. the Footer WA link) when no number is set for the
+// section, so existing content that hasn't set this yet keeps working.
+function buildWaLink(number, message, fallbackHref) {
+  const cleanNumber = (number || "").replace(/[^0-9]/g, "");
+  if (!cleanNumber) return fallbackHref;
+  const query = message ? `?text=${encodeURIComponent(message)}` : "";
+  return `https://wa.me/${cleanNumber}${query}`;
+}
+
 async function getSiteContent() {
   try {
     const data = await api.get("/content");
@@ -135,9 +147,11 @@ export default async function HomePage() {
               ))}
             </ul>
             <a
-              href={
-                content.footer?.whatsappLink || "https://wa.me/6281234567890"
-              }
+              href={buildWaLink(
+                layanan.waNumber,
+                layanan.waMessage,
+                content.footer?.whatsappLink || "https://wa.me/6281234567890",
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-6 py-3 rounded-full bg-cream text-cinnamon-700 font-semibold hover:bg-cream/90 transition">
