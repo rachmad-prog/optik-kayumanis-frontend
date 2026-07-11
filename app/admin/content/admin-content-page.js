@@ -4,11 +4,6 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { api } from "../../../lib/api";
 import { DEFAULT_CONTENT } from "../../../lib/defaultContent";
-import {
-  isDirectVideoUrl,
-  isEmbeddableLink,
-  toEmbedUrl,
-} from "../../../lib/media";
 
 function Field({ label, value, onChange, textarea, hint }) {
   return (
@@ -82,86 +77,66 @@ function AddRemove({ onAdd, onRemove, addLabel }) {
   );
 }
 
-// Reusable image/video picker: shows a live preview (image, direct video file,
-// or YouTube/Vimeo embed), a file-upload button, and a manual URL field &
-// used anywhere a section has an optional media slot (Layanan, Tentang, etc).
-function MediaField({ label, value, onChange, uploading, onUploadFile }) {
+function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
   return (
-    <div className="mt-2">
-      <label className="block mb-2">
-        <span className="block text-sm font-semibold text-bark-700 mb-1">
-          {label}
-        </span>
+    <div className="mb-4">
+      <label className="block text-sm font-semibold text-bark-700 mb-1">
+        {label}
       </label>
-      <div className="w-full aspect-[4/3] max-w-xs rounded-xl border border-sand overflow-hidden bg-cream mb-3">
-        {value ? (
-          isDirectVideoUrl(value) ? (
-            <video
-              src={value}
-              className="w-full h-full object-cover"
-              muted
-              loop
-              autoPlay
-              playsInline
-            />
-          ) : isEmbeddableLink(value) ? (
-            <iframe
-              src={toEmbedUrl(value)}
-              className="w-full h-full"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
-          ) : (
-            <img src={value} alt="" className="w-full h-full object-cover" />
-          )
+      <div className="flex items-center gap-4">
+        {image ? (
+          <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
+            <img src={image} alt="" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={onRemove}
+              className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+              aria-label="Hapus gambar">
+              x
+            </button>
+          </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs text-bark-300 text-center px-3">
-            Belum ada gambar/video & tampilan memakai gradasi bawaan
+          <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+            Belum ada
           </div>
         )}
-      </div>
-      <div className="flex flex-wrap items-center gap-2 mb-2">
-        <label className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50 cursor-pointer">
+        <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
           <span>
             {uploading
               ? "Mengunggah..."
-              : value
+              : image
                 ? "Ganti Gambar"
                 : "+ Upload Gambar"}
           </span>
           <input
             type="file"
             accept="image/*"
-            className="hidden"
             disabled={uploading}
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) onUploadFile(file);
+              if (file) onUpload(file);
               e.target.value = "";
             }}
+            className="hidden"
           />
         </label>
-        {value && (
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className="text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-            Hapus
-          </button>
-        )}
       </div>
-      <Field
-        label="Atau tempel link gambar/video"
-        value={value || ""}
-        onChange={onChange}
-        hint="Bisa link gambar (.jpg/.png), video (.mp4/.webm), atau link YouTube/Vimeo."
-      />
     </div>
   );
 }
 
+const showcaseSlideTemplate = {
+  title: "Slide baru",
+  desc: "Deskripsi slide baru",
+  image: "",
+};
+
+function imageUploadKey(path) {
+  return path.join(".");
+}
+
 // Lets admins upload a manual image for each product category (shown on the
-// homepage catalog cards). Independent from the SiteContent JSON blob above &
+// homepage catalog cards). Independent from the SiteContent JSON blob above —
 // this reads/writes the real Category rows via /api/categories.
 function CategoryImagesPanel({ token }) {
   const [categories, setCategories] = useState([]);
@@ -324,15 +299,11 @@ export default function AdminContentPage() {
   const [savingMap, setSavingMap] = useState({});
   const [statusMap, setStatusMap] = useState({});
   const [slideUploading, setSlideUploading] = useState({});
-  const [layananMediaUploading, setLayananMediaUploading] = useState(false);
-  const [tentangMediaUploading, setTentangMediaUploading] = useState(false);
-  const [sliderUploading, setSliderUploading] = useState({});
-  const [kontakImageUploading, setKontakImageUploading] = useState(false);
 
   useEffect(() => {
     api
       .get("/content")
-      .then((data) => setContent({ ...DEFAULT_CONTENT, ...data.content }))
+      .then((data) => setContent(data.content))
       .catch(() => setContent(DEFAULT_CONTENT));
   }, []);
 
@@ -398,88 +369,27 @@ export default function AdminContentPage() {
     }
   }
 
-  // Uploads an image/video for the Layanan section's right-side media slot.
-  async function uploadLayananMedia(file) {
-    setLayananMediaUploading(true);
+  async function uploadContentImage(statusKey, onUploaded, file) {
+    setSlideUploading((m) => ({ ...m, [statusKey]: true }));
+    setStatusMap((m) => ({ ...m, [statusKey]: null }));
     try {
       const formData = new FormData();
       formData.append("files", file);
       const data = await api.upload("/uploads", formData, token);
-      update(["layanan", "media"], data.urls[0]);
+      onUploaded(data.urls[0]);
     } catch (err) {
       setStatusMap((m) => ({
         ...m,
-        layanan: {
-          ok: false,
-          message: err.message || "Gagal mengunggah file.",
-        },
-      }));
-    } finally {
-      setLayananMediaUploading(false);
-    }
-  }
-
-  // Uploads an image/video for the Tentang Kami section's photo slot.
-  async function uploadTentangMedia(file) {
-    setTentangMediaUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("files", file);
-      const data = await api.upload("/uploads", formData, token);
-      update(["tentang", "media"], data.urls[0]);
-    } catch (err) {
-      setStatusMap((m) => ({
-        ...m,
-        tentang: {
-          ok: false,
-          message: err.message || "Gagal mengunggah file.",
-        },
-      }));
-    } finally {
-      setTentangMediaUploading(false);
-    }
-  }
-
-  async function uploadSliderImage(sectionKey, index, file) {
-    const uploadKey = `${sectionKey}-${index}`;
-    setSliderUploading((m) => ({ ...m, [uploadKey]: true }));
-    try {
-      const formData = new FormData();
-      formData.append("files", file);
-      const data = await api.upload("/uploads", formData, token);
-      updateArrayItem([sectionKey, "items"], index, "image", data.urls[0]);
-    } catch (err) {
-      setStatusMap((m) => ({
-        ...m,
-        [sectionKey]: {
+        [statusKey]: {
           ok: false,
           message: err.message || "Gagal mengunggah gambar.",
         },
       }));
     } finally {
-      setSliderUploading((m) => ({ ...m, [uploadKey]: false }));
+      setSlideUploading((m) => ({ ...m, [statusKey]: false }));
     }
   }
 
-  async function uploadKontakImage(file) {
-    setKontakImageUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("files", file);
-      const data = await api.upload("/uploads", formData, token);
-      update(["kontak", "image"], data.urls[0]);
-    } catch (err) {
-      setStatusMap((m) => ({
-        ...m,
-        kontak: {
-          ok: false,
-          message: err.message || "Gagal mengunggah gambar.",
-        },
-      }));
-    } finally {
-      setKontakImageUploading(false);
-    }
-  }
   // Saves only the given slice of content (e.g. { hero: { topbarLeft, topbarRight } })
   // instead of the whole page, so each section's button only touches its own data.
   async function saveSection(id, payload) {
@@ -514,7 +424,7 @@ export default function AdminContentPage() {
           Konten Halaman
         </h1>
         <p className="text-sm text-bark-300 mt-1">
-          Setiap bagian punya tombol simpan sendiri & cukup simpan bagian yang
+          Setiap bagian punya tombol simpan sendiri — cukup simpan bagian yang
           Anda ubah.
         </p>
       </div>
@@ -576,7 +486,7 @@ export default function AdminContentPage() {
                     }
                     className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
                     aria-label="Hapus gambar">
-                    Ã—
+                    ×
                   </button>
                 </div>
               ) : (
@@ -632,14 +542,14 @@ export default function AdminContentPage() {
             />
             <div className="grid sm:grid-cols-2 gap-3">
               <Field
-                label="Tombol utama & teks"
+                label="Tombol utama — teks"
                 value={slide.ctaPrimaryLabel}
                 onChange={(v) =>
                   updateArrayItem(["hero", "slides"], i, "ctaPrimaryLabel", v)
                 }
               />
               <Field
-                label="Tombol utama & link"
+                label="Tombol utama — link"
                 hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
                 value={slide.ctaPrimaryHref}
                 onChange={(v) =>
@@ -647,14 +557,14 @@ export default function AdminContentPage() {
                 }
               />
               <Field
-                label="Tombol kedua & teks (kosongkan jika tidak perlu)"
+                label="Tombol kedua — teks (kosongkan jika tidak perlu)"
                 value={slide.ctaSecondaryLabel}
                 onChange={(v) =>
                   updateArrayItem(["hero", "slides"], i, "ctaSecondaryLabel", v)
                 }
               />
               <Field
-                label="Tombol kedua & link"
+                label="Tombol kedua — link"
                 hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
                 value={slide.ctaSecondaryHref}
                 onChange={(v) =>
@@ -742,14 +652,14 @@ export default function AdminContentPage() {
         {content.valueProps.items.map((item, i) => (
           <div key={i} className="border border-sand rounded-xl p-4 mb-3">
             <Field
-              label={`Kartu ${i + 1} & Judul`}
+              label={`Kartu ${i + 1} — Judul`}
               value={item.title}
               onChange={(v) =>
                 updateArrayItem(["valueProps", "items"], i, "title", v)
               }
             />
             <Field
-              label={`Kartu ${i + 1} & Deskripsi`}
+              label={`Kartu ${i + 1} — Deskripsi`}
               value={item.desc}
               onChange={(v) =>
                 updateArrayItem(["valueProps", "items"], i, "desc", v)
@@ -858,36 +768,271 @@ export default function AdminContentPage() {
           addLabel="Tambah Poin"
           onAdd={() => addArrayItem(["layanan", "bullets"], "Poin baru")}
         />
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Tombol CTA & WhatsApp
-        </p>
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="mt-4">
           <Field
             label="Teks tombol CTA"
             value={content.layanan.ctaLabel}
             onChange={(v) => update(["layanan", "ctaLabel"], v)}
           />
+        </div>
+      </Section>
+
+      {/* Layanan Optik Kayumanis slider */}
+      <Section
+        title='Section "Layanan Optik Kayumanis"'
+        onSave={() =>
+          saveSection("layananSlider", { layananSlider: content.layananSlider })
+        }
+        saving={savingMap.layananSlider}
+        status={statusMap.layananSlider}>
+        <Field
+          label="Judul"
+          value={content.layananSlider.title}
+          onChange={(v) => update(["layananSlider", "title"], v)}
+        />
+        <Field
+          label="Subjudul"
+          value={content.layananSlider.subtitle}
+          onChange={(v) => update(["layananSlider", "subtitle"], v)}
+          textarea
+        />
+        {content.layananSlider.items.map((item, i) => (
+          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+              Slide Layanan {i + 1}
+            </p>
+            <ImageUploadField
+              label="Gambar Slide"
+              image={item.image}
+              uploading={slideUploading[`layananSlider-${i}`]}
+              onUpload={(file) =>
+                uploadContentImage(
+                  `layananSlider-${i}`,
+                  (url) =>
+                    updateArrayItem(
+                      ["layananSlider", "items"],
+                      i,
+                      "image",
+                      url,
+                    ),
+                  file,
+                )
+              }
+              onRemove={() =>
+                updateArrayItem(["layananSlider", "items"], i, "image", "")
+              }
+            />
+            <Field
+              label="Judul Slide"
+              value={item.title}
+              onChange={(v) =>
+                updateArrayItem(["layananSlider", "items"], i, "title", v)
+              }
+            />
+            <Field
+              label="Deskripsi Slide"
+              value={item.desc}
+              onChange={(v) =>
+                updateArrayItem(["layananSlider", "items"], i, "desc", v)
+              }
+              textarea
+            />
+            <AddRemove
+              addLabel="Tambah Slide Layanan"
+              onAdd={() =>
+                addArrayItem(["layananSlider", "items"], {
+                  title: "Layanan Baru",
+                  desc: "Deskripsi layanan baru.",
+                  image: "",
+                })
+              }
+              onRemove={
+                content.layananSlider.items.length > 1
+                  ? () => removeArrayItem(["layananSlider", "items"], i)
+                  : null
+              }
+            />
+          </div>
+        ))}
+      </Section>
+
+      {/* Cabang Optik Kayumanis slider */}
+      <Section
+        title='Section "Cabang Optik Kayumanis"'
+        onSave={() => saveSection("cabang", { cabang: content.cabang })}
+        saving={savingMap.cabang}
+        status={statusMap.cabang}>
+        <Field
+          label="Judul"
+          value={content.cabang.title}
+          onChange={(v) => update(["cabang", "title"], v)}
+        />
+        <Field
+          label="Subjudul"
+          value={content.cabang.subtitle}
+          onChange={(v) => update(["cabang", "subtitle"], v)}
+          textarea
+        />
+        <div className="grid sm:grid-cols-2 gap-3">
           <Field
-            label="Nomor WhatsApp tujuan"
-            value={content.layanan.waNumber}
-            onChange={(v) => update(["layanan", "waNumber"], v)}
-            hint="Contoh: 6281234567890 (pakai kode negara 62, tanpa spasi/tanda +). Kosongkan untuk pakai nomor WA Footer."
+            label="Teks Tombol CTA"
+            value={content.cabang.ctaLabel}
+            onChange={(v) => update(["cabang", "ctaLabel"], v)}
+          />
+          <Field
+            label="URL Tombol CTA"
+            hint='Isi manual, contoh: "https://wa.me/62..." atau "https://maps.app.goo.gl/..."'
+            value={content.cabang.ctaHref}
+            onChange={(v) => update(["cabang", "ctaHref"], v)}
           />
         </div>
-        <Field
-          label="Pesan otomatis WhatsApp"
-          value={content.layanan.waMessage}
-          onChange={(v) => update(["layanan", "waMessage"], v)}
-          textarea
-          hint="Pesan ini otomatis terisi saat pengunjung klik tombol dan chat WA terbuka."
-        />
+        {content.cabang.items.map((item, i) => (
+          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+              Slide Cabang {i + 1}
+            </p>
+            <ImageUploadField
+              label="Gambar Cabang"
+              image={item.image}
+              uploading={slideUploading[`cabang-${i}`]}
+              onUpload={(file) =>
+                uploadContentImage(
+                  `cabang-${i}`,
+                  (url) =>
+                    updateArrayItem(["cabang", "items"], i, "image", url),
+                  file,
+                )
+              }
+              onRemove={() =>
+                updateArrayItem(["cabang", "items"], i, "image", "")
+              }
+            />
+            <Field
+              label="Nama Cabang"
+              value={item.title}
+              onChange={(v) =>
+                updateArrayItem(["cabang", "items"], i, "title", v)
+              }
+            />
+            <Field
+              label="Alamat / Deskripsi"
+              value={item.desc}
+              onChange={(v) =>
+                updateArrayItem(["cabang", "items"], i, "desc", v)
+              }
+              textarea
+            />
+            <AddRemove
+              addLabel="Tambah Slide Cabang"
+              onAdd={() =>
+                addArrayItem(["cabang", "items"], {
+                  title: "Cabang Baru",
+                  desc: "Alamat cabang baru.",
+                  image: "",
+                })
+              }
+              onRemove={
+                content.cabang.items.length > 1
+                  ? () => removeArrayItem(["cabang", "items"], i)
+                  : null
+              }
+            />
+          </div>
+        ))}
+      </Section>
 
-        <MediaField
-          label="Gambar / video (sisi kanan section)"
-          value={content.layanan.media}
-          onChange={(v) => update(["layanan", "media"], v)}
-          uploading={layananMediaUploading}
-          onUploadFile={uploadLayananMedia}
+      {/* Sponsor */}
+      <Section
+        title="Slider Sponsor & Partner"
+        onSave={() => saveSection("sponsors", { sponsors: content.sponsors })}
+        saving={savingMap.sponsors}
+        status={statusMap.sponsors}>
+        <Field
+          label="Judul"
+          value={content.sponsors.title}
+          onChange={(v) => update(["sponsors", "title"], v)}
+        />
+        <Field
+          label="Subjudul"
+          value={content.sponsors.subtitle}
+          onChange={(v) => update(["sponsors", "subtitle"], v)}
+          textarea
+        />
+        {content.sponsors.items.map((item, i) => (
+          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+              Sponsor {i + 1}
+            </p>
+            <ImageUploadField
+              label="Foto Sponsor"
+              image={item.image}
+              uploading={slideUploading[`sponsor-${i}`]}
+              onUpload={(file) =>
+                uploadContentImage(
+                  `sponsor-${i}`,
+                  (url) =>
+                    updateArrayItem(["sponsors", "items"], i, "image", url),
+                  file,
+                )
+              }
+              onRemove={() =>
+                updateArrayItem(["sponsors", "items"], i, "image", "")
+              }
+            />
+            <Field
+              label="Nama Sponsor"
+              value={item.name}
+              onChange={(v) =>
+                updateArrayItem(["sponsors", "items"], i, "name", v)
+              }
+            />
+            <AddRemove
+              addLabel="Tambah Foto Sponsor"
+              onAdd={() =>
+                addArrayItem(["sponsors", "items"], {
+                  name: "Sponsor Baru",
+                  image: "",
+                })
+              }
+              onRemove={
+                content.sponsors.items.length > 1
+                  ? () => removeArrayItem(["sponsors", "items"], i)
+                  : null
+              }
+            />
+          </div>
+        ))}
+      </Section>
+
+      {/* Kontak */}
+      <Section
+        title="Section Kontak"
+        onSave={() => saveSection("kontak", { kontak: content.kontak })}
+        saving={savingMap.kontak}
+        status={statusMap.kontak}>
+        <Field
+          label="Judul"
+          value={content.kontak.title}
+          onChange={(v) => update(["kontak", "title"], v)}
+        />
+        <Field
+          label="Subjudul"
+          value={content.kontak.subtitle}
+          onChange={(v) => update(["kontak", "subtitle"], v)}
+          textarea
+        />
+        <ImageUploadField
+          label="Gambar Samping Form"
+          image={content.kontak.image}
+          uploading={slideUploading.kontakImage}
+          onUpload={(file) =>
+            uploadContentImage(
+              "kontakImage",
+              (url) => update(["kontak", "image"], url),
+              file,
+            )
+          }
+          onRemove={() => update(["kontak", "image"], "")}
         />
       </Section>
 
@@ -953,361 +1098,8 @@ export default function AdminContentPage() {
             })
           }
         />
-
-        <MediaField
-          label="Gambar / video (sisi kiri section)"
-          value={content.tentang.media}
-          onChange={(v) => update(["tentang", "media"], v)}
-          uploading={tentangMediaUploading}
-          onUploadFile={uploadTentangMedia}
-        />
       </Section>
 
-      {/* Slider Layanan Optik Kayumanis */}
-      <Section
-        title="Slider Layanan Optik Kayumanis"
-        onSave={() =>
-          saveSection("layananSlider", { layananSlider: content.layananSlider })
-        }
-        saving={savingMap.layananSlider}
-        status={statusMap.layananSlider}>
-        <Field
-          label="Judul"
-          value={content.layananSlider.title}
-          onChange={(v) => update(["layananSlider", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.layananSlider.subtitle}
-          onChange={(v) => update(["layananSlider", "subtitle"], v)}
-          textarea
-        />
-        {content.layananSlider.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Slide Layanan {i + 1}
-            </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(
-                        ["layananSlider", "items"],
-                        i,
-                        "image",
-                        "",
-                      )
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`layananSlider-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`layananSlider-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("layananSlider", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <Field
-              label="Judul slide"
-              value={item.title}
-              onChange={(v) =>
-                updateArrayItem(["layananSlider", "items"], i, "title", v)
-              }
-            />
-            <Field
-              label="Deskripsi slide"
-              value={item.desc}
-              onChange={(v) =>
-                updateArrayItem(["layananSlider", "items"], i, "desc", v)
-              }
-              textarea
-            />
-            {content.layananSlider.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["layananSlider", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Slide
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Slide Layanan"
-          onAdd={() =>
-            addArrayItem(["layananSlider", "items"], {
-              title: "Layanan baru",
-              desc: "Deskripsi layanan baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
-
-      {/* Slider Cabang Optik Kayumanis */}
-      <Section
-        title="Slider Cabang Optik Kayumanis"
-        onSave={() => saveSection("cabang", { cabang: content.cabang })}
-        saving={savingMap.cabang}
-        status={statusMap.cabang}>
-        <Field
-          label="Judul"
-          value={content.cabang.title}
-          onChange={(v) => update(["cabang", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.cabang.subtitle}
-          onChange={(v) => update(["cabang", "subtitle"], v)}
-          textarea
-        />
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field
-            label="Teks tombol CTA"
-            value={content.cabang.ctaLabel}
-            onChange={(v) => update(["cabang", "ctaLabel"], v)}
-          />
-          <Field
-            label="URL tombol CTA"
-            value={content.cabang.ctaHref}
-            onChange={(v) => update(["cabang", "ctaHref"], v)}
-            hint="Isi URL manual, misalnya link WhatsApp atau Google Maps."
-          />
-        </div>
-        {content.cabang.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Slide Cabang {i + 1}
-            </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(["cabang", "items"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`cabang-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`cabang-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("cabang", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <Field
-              label="Nama cabang"
-              value={item.title}
-              onChange={(v) =>
-                updateArrayItem(["cabang", "items"], i, "title", v)
-              }
-            />
-            <Field
-              label="Deskripsi / alamat"
-              value={item.desc}
-              onChange={(v) =>
-                updateArrayItem(["cabang", "items"], i, "desc", v)
-              }
-              textarea
-            />
-            {content.cabang.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["cabang", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Slide
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Slide Cabang"
-          onAdd={() =>
-            addArrayItem(["cabang", "items"], {
-              title: "Cabang baru",
-              desc: "Alamat cabang baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
-
-      {/* Sponsor */}
-      <Section
-        title="Slider Sponsor"
-        onSave={() => saveSection("sponsors", { sponsors: content.sponsors })}
-        saving={savingMap.sponsors}
-        status={statusMap.sponsors}>
-        <Field
-          label="Judul"
-          value={content.sponsors.title}
-          onChange={(v) => update(["sponsors", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.sponsors.subtitle}
-          onChange={(v) => update(["sponsors", "subtitle"], v)}
-          textarea
-        />
-        {content.sponsors.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Sponsor {i + 1}
-            </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0 bg-white">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-contain p-2"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(["sponsors", "items"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`sponsors-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Foto"
-                      : "+ Upload Foto"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`sponsors-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("sponsors", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <Field
-              label="Nama sponsor"
-              value={item.name || ""}
-              onChange={(v) =>
-                updateArrayItem(["sponsors", "items"], i, "name", v)
-              }
-            />
-            {content.sponsors.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["sponsors", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Sponsor
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Foto Sponsor"
-          onAdd={() =>
-            addArrayItem(["sponsors", "items"], {
-              name: "Sponsor baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
-
-      {/* Kontak */}
-      <Section
-        title="Section Kontak"
-        onSave={() => saveSection("kontak", { kontak: content.kontak })}
-        saving={savingMap.kontak}
-        status={statusMap.kontak}>
-        <Field
-          label="Judul"
-          value={content.kontak.title}
-          onChange={(v) => update(["kontak", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.kontak.subtitle}
-          onChange={(v) => update(["kontak", "subtitle"], v)}
-          textarea
-        />
-        <MediaField
-          label="Gambar di sisi kanan form"
-          value={content.kontak.image}
-          onChange={(v) => update(["kontak", "image"], v)}
-          uploading={kontakImageUploading}
-          onUploadFile={uploadKontakImage}
-        />
-      </Section>
       {/* Footer */}
       <Section
         title="Footer"
@@ -1371,7 +1163,7 @@ export default function AdminContentPage() {
         <AddRemove
           addLabel="Tambah Baris Jam"
           onAdd={() =>
-            addArrayItem(["footer", "hours"], "Setiap Hari: 09.00 â€“ 20.00")
+            addArrayItem(["footer", "hours"], "Setiap Hari: 09.00 – 20.00")
           }
         />
 
@@ -1383,41 +1175,18 @@ export default function AdminContentPage() {
             label="Instagram"
             value={content.footer.socials.instagram}
             onChange={(v) => update(["footer", "socials", "instagram"], v)}
-            hint="Contoh: instagram.com/optikkayumanis"
           />
           <Field
             label="Facebook"
             value={content.footer.socials.facebook}
             onChange={(v) => update(["footer", "socials", "facebook"], v)}
-            hint="Contoh: facebook.com/optikkayumanis"
           />
           <Field
             label="TikTok"
             value={content.footer.socials.tiktok}
             onChange={(v) => update(["footer", "socials", "tiktok"], v)}
-            hint="Contoh: tiktok.com/@optikkayumanis"
           />
         </div>
-
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Lokasi Peta
-        </p>
-        <Field
-          label="Alamat atau link sematkan Google Maps"
-          value={content.footer.mapEmbed || ""}
-          onChange={(v) => update(["footer", "mapEmbed"], v)}
-          hint='Isi alamat toko (mis. "Optik Kayumanis, Jl. Kayumanis No 12, Bogor"), atau tempel link dari Google Maps â†’ Bagikan â†’ Sematkan peta â†’ salin src iframe-nya untuk kontrol titik lokasi yang presisi.'
-        />
-
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Teks Hak Cipta (bawah footer)
-        </p>
-        <Field
-          label="Teks setelah tahun"
-          value={content.footer.copyrightText || ""}
-          onChange={(v) => update(["footer", "copyrightText"], v)}
-          hint='Tahun berjalan ditambahkan otomatis di depan. Contoh hasil: "Â© 2026 Optik Kayumanis. Seluruh hak cipta dilindungi."'
-        />
       </Section>
     </div>
   );

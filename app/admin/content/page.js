@@ -318,9 +318,25 @@ function CategoryImagesPanel({ token }) {
   );
 }
 
+const TABS = [
+  { id: "topbar", label: "Topbar" },
+  { id: "hero", label: "Hero / Banner Utama" },
+  { id: "marquee", label: "Marquee" },
+  { id: "valueprops", label: "Kenapa Kami" },
+  { id: "katalog", label: "Katalog Produk" },
+  { id: "layanan", label: "Layanan Periksa Mata" },
+  { id: "tentang", label: "Tentang Kami" },
+  { id: "sliderLayanan", label: "Slider Layanan" },
+  { id: "sliderCabang", label: "Slider Cabang" },
+  { id: "sponsor", label: "Sponsor" },
+  { id: "kontak", label: "Kontak" },
+  { id: "footer", label: "Footer" },
+];
+
 export default function AdminContentPage() {
   const { token } = useAuth();
   const [content, setContent] = useState(null);
+  const [activeTab, setActiveTab] = useState("topbar");
   const [savingMap, setSavingMap] = useState({});
   const [statusMap, setStatusMap] = useState({});
   const [slideUploading, setSlideUploading] = useState({});
@@ -519,890 +535,1004 @@ export default function AdminContentPage() {
         </p>
       </div>
 
-      {/* Topbar */}
-      <Section
-        title="Topbar (garis atas navbar)"
-        onSave={() =>
-          saveSection("topbar", {
-            hero: {
-              topbarLeft: content.hero.topbarLeft,
-              topbarRight: content.hero.topbarRight,
-            },
-          })
-        }
-        saving={savingMap.topbar}
-        status={statusMap.topbar}>
-        <Field
-          label="Teks kiri (desktop)"
-          value={content.hero.topbarLeft}
-          onChange={(v) => update(["hero", "topbarLeft"], v)}
-        />
-        <Field
-          label="Teks kanan"
-          value={content.hero.topbarRight}
-          onChange={(v) => update(["hero", "topbarRight"], v)}
-        />
-      </Section>
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-sand pb-4 sticky top-0 bg-cream/95 backdrop-blur z-10 pt-1">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setActiveTab(t.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+              activeTab === t.id
+                ? "bg-cinnamon-500 border-cinnamon-500 text-white"
+                : "border-sand text-bark-500 hover:border-cinnamon-300 hover:text-cinnamon-600"
+            }`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Hero slides */}
-      <Section
-        title="Hero / Banner Utama"
-        onSave={() =>
-          saveSection("heroSlides", { hero: { slides: content.hero.slides } })
-        }
-        saving={savingMap.heroSlides}
-        status={statusMap.heroSlides}>
-        {content.hero.slides.map((slide, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Slide {i + 1}
-            </p>
+      {activeTab === "topbar" && (
+        <div className="space-y-6">
+          {/* Topbar */}
+          <Section
+            title="Topbar (garis atas navbar)"
+            onSave={() =>
+              saveSection("topbar", {
+                hero: {
+                  topbarLeft: content.hero.topbarLeft,
+                  topbarRight: content.hero.topbarRight,
+                },
+              })
+            }
+            saving={savingMap.topbar}
+            status={statusMap.topbar}>
+            <Field
+              label="Teks kiri (desktop)"
+              value={content.hero.topbarLeft}
+              onChange={(v) => update(["hero", "topbarLeft"], v)}
+            />
+            <Field
+              label="Teks kanan"
+              value={content.hero.topbarRight}
+              onChange={(v) => update(["hero", "topbarRight"], v)}
+            />
+          </Section>
+        </div>
+      )}
 
-            <label className="block text-sm font-semibold text-bark-700 mb-1">
-              Gambar Background
-            </label>
-            <div className="flex items-center gap-4 mb-4">
-              {slide.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={slide.image}
-                    alt=""
-                    className="w-full h-full object-cover"
+      {activeTab === "hero" && (
+        <div className="space-y-6">
+          {/* Hero slides */}
+          <Section
+            title="Hero / Banner Utama"
+            onSave={() =>
+              saveSection("heroSlides", {
+                hero: { slides: content.hero.slides },
+              })
+            }
+            saving={savingMap.heroSlides}
+            status={statusMap.heroSlides}>
+            {content.hero.slides.map((slide, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+                <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+                  Slide {i + 1}
+                </p>
+
+                <label className="block text-sm font-semibold text-bark-700 mb-1">
+                  Gambar Background
+                </label>
+                <div className="flex items-center gap-4 mb-4">
+                  {slide.image ? (
+                    <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
+                      <img
+                        src={slide.image}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateArrayItem(["hero", "slides"], i, "image", "")
+                        }
+                        className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+                        aria-label="Hapus gambar">
+                        Ã—
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+                      Belum ada
+                    </div>
+                  )}
+                  <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
+                    <span>
+                      {slideUploading[i]
+                        ? "Mengunggah..."
+                        : slide.image
+                          ? "Ganti Gambar"
+                          : "+ Upload Gambar"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={slideUploading[i]}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadSlideImage(i, file);
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-bark-300 mb-4">
+                  Jika tidak diisi, slide memakai warna gradasi bawaan.
+                </p>
+
+                <Field
+                  label="Label kecil (tag)"
+                  value={slide.tag}
+                  onChange={(v) =>
+                    updateArrayItem(["hero", "slides"], i, "tag", v)
+                  }
+                />
+                <Field
+                  label="Judul"
+                  value={slide.title}
+                  onChange={(v) =>
+                    updateArrayItem(["hero", "slides"], i, "title", v)
+                  }
+                  textarea
+                />
+                <Field
+                  label="Deskripsi"
+                  value={slide.desc}
+                  onChange={(v) =>
+                    updateArrayItem(["hero", "slides"], i, "desc", v)
+                  }
+                  textarea
+                />
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <Field
+                    label="Tombol utama & teks"
+                    value={slide.ctaPrimaryLabel}
+                    onChange={(v) =>
+                      updateArrayItem(
+                        ["hero", "slides"],
+                        i,
+                        "ctaPrimaryLabel",
+                        v,
+                      )
+                    }
                   />
+                  <Field
+                    label="Tombol utama & link"
+                    hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
+                    value={slide.ctaPrimaryHref}
+                    onChange={(v) =>
+                      updateArrayItem(
+                        ["hero", "slides"],
+                        i,
+                        "ctaPrimaryHref",
+                        v,
+                      )
+                    }
+                  />
+                  <Field
+                    label="Tombol kedua & teks (kosongkan jika tidak perlu)"
+                    value={slide.ctaSecondaryLabel}
+                    onChange={(v) =>
+                      updateArrayItem(
+                        ["hero", "slides"],
+                        i,
+                        "ctaSecondaryLabel",
+                        v,
+                      )
+                    }
+                  />
+                  <Field
+                    label="Tombol kedua & link"
+                    hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
+                    value={slide.ctaSecondaryHref}
+                    onChange={(v) =>
+                      updateArrayItem(
+                        ["hero", "slides"],
+                        i,
+                        "ctaSecondaryHref",
+                        v,
+                      )
+                    }
+                  />
+                </div>
+                <AddRemove
+                  addLabel="Tambah Slide"
+                  onAdd={() =>
+                    addArrayItem(["hero", "slides"], {
+                      image: "",
+                      tag: "Label Baru",
+                      title: "Judul baru",
+                      desc: "Deskripsi baru",
+                      ctaPrimaryLabel: "Lihat Koleksi",
+                      ctaPrimaryHref: "/shop",
+                      ctaSecondaryLabel: "",
+                      ctaSecondaryHref: "",
+                    })
+                  }
+                  onRemove={
+                    content.hero.slides.length > 1
+                      ? () => removeArrayItem(["hero", "slides"], i)
+                      : null
+                  }
+                />
+              </div>
+            ))}
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "marquee" && (
+        <div className="space-y-6">
+          {/* Marquee */}
+          <Section
+            title="Teks Berjalan (Marquee)"
+            onSave={() => saveSection("marquee", { marquee: content.marquee })}
+            saving={savingMap.marquee}
+            status={statusMap.marquee}>
+            {content.marquee.map((item, i) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
+                  value={item}
+                  onChange={(e) =>
+                    setContent((prev) => {
+                      const next = structuredClone(prev);
+                      next.marquee[i] = e.target.value;
+                      return next;
+                    })
+                  }
+                />
+                {content.marquee.length > 1 && (
                   <button
                     type="button"
-                    onClick={() =>
-                      updateArrayItem(["hero", "slides"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    Ã—
+                    onClick={() => removeArrayItem(["marquee"], i)}
+                    className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
                   </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {slideUploading[i]
-                    ? "Mengunggah..."
-                    : slide.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={slideUploading[i]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSlideImage(i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <p className="text-xs text-bark-300 mb-4">
-              Jika tidak diisi, slide memakai warna gradasi bawaan.
-            </p>
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Teks"
+              onAdd={() => addArrayItem(["marquee"], "Teks baru")}
+            />
+          </Section>
+        </div>
+      )}
 
+      {activeTab === "valueprops" && (
+        <div className="space-y-6">
+          {/* Value props */}
+          <Section
+            title='Section "Kenapa Optik Kayumanis"'
+            onSave={() =>
+              saveSection("valueProps", { valueProps: content.valueProps })
+            }
+            saving={savingMap.valueProps}
+            status={statusMap.valueProps}>
             <Field
-              label="Label kecil (tag)"
-              value={slide.tag}
-              onChange={(v) => updateArrayItem(["hero", "slides"], i, "tag", v)}
+              label="Label kecil"
+              value={content.valueProps.eyebrow}
+              onChange={(v) => update(["valueProps", "eyebrow"], v)}
             />
             <Field
               label="Judul"
-              value={slide.title}
-              onChange={(v) =>
-                updateArrayItem(["hero", "slides"], i, "title", v)
+              value={content.valueProps.title}
+              onChange={(v) => update(["valueProps", "title"], v)}
+            />
+            {content.valueProps.items.map((item, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-3">
+                <Field
+                  label={`Kartu ${i + 1} & Judul`}
+                  value={item.title}
+                  onChange={(v) =>
+                    updateArrayItem(["valueProps", "items"], i, "title", v)
+                  }
+                />
+                <Field
+                  label={`Kartu ${i + 1} & Deskripsi`}
+                  value={item.desc}
+                  onChange={(v) =>
+                    updateArrayItem(["valueProps", "items"], i, "desc", v)
+                  }
+                  textarea
+                />
+                {content.valueProps.items.length > 1 && (
+                  <AddRemove
+                    addLabel=""
+                    onAdd={() => {}}
+                    onRemove={() => removeArrayItem(["valueProps", "items"], i)}
+                  />
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Kartu"
+              onAdd={() =>
+                addArrayItem(["valueProps", "items"], {
+                  title: "Judul baru",
+                  desc: "Deskripsi baru",
+                })
               }
+            />
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "katalog" && (
+        <div className="space-y-6">
+          {/* Katalog */}
+          <Section
+            title="Section Katalog Produk (heading)"
+            onSave={() => saveSection("katalog", { katalog: content.katalog })}
+            saving={savingMap.katalog}
+            status={statusMap.katalog}>
+            <Field
+              label="Label kecil"
+              value={content.katalog.eyebrow}
+              onChange={(v) => update(["katalog", "eyebrow"], v)}
+            />
+            <Field
+              label="Judul"
+              value={content.katalog.title}
+              onChange={(v) => update(["katalog", "title"], v)}
+            />
+            <Field
+              label='Teks tombol "Lihat Semua"'
+              value={content.katalog.linkLabel}
+              onChange={(v) => update(["katalog", "linkLabel"], v)}
+            />
+            <p className="text-xs text-bark-300">
+              Kategori & jumlah produk otomatis dari menu Produk. Gambar tiap
+              kategori diatur di panel di bawah ini.
+            </p>
+          </Section>
+
+          <CategoryImagesPanel token={token} />
+        </div>
+      )}
+
+      {activeTab === "layanan" && (
+        <div className="space-y-6">
+          {/* Layanan */}
+          <Section
+            title="Section Layanan Periksa Mata"
+            onSave={() => saveSection("layanan", { layanan: content.layanan })}
+            saving={savingMap.layanan}
+            status={statusMap.layanan}>
+            <Field
+              label="Label kecil"
+              value={content.layanan.eyebrow}
+              onChange={(v) => update(["layanan", "eyebrow"], v)}
+            />
+            <Field
+              label="Judul"
+              value={content.layanan.title}
+              onChange={(v) => update(["layanan", "title"], v)}
               textarea
             />
             <Field
               label="Deskripsi"
-              value={slide.desc}
-              onChange={(v) =>
-                updateArrayItem(["hero", "slides"], i, "desc", v)
+              value={content.layanan.description}
+              onChange={(v) => update(["layanan", "description"], v)}
+              textarea
+            />
+            <p className="text-sm font-semibold text-bark-700 mb-2">
+              Daftar poin (bullet)
+            </p>
+            {content.layanan.bullets.map((b, i) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
+                  value={b}
+                  onChange={(e) =>
+                    setContent((prev) => {
+                      const next = structuredClone(prev);
+                      next.layanan.bullets[i] = e.target.value;
+                      return next;
+                    })
+                  }
+                />
+                {content.layanan.bullets.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["layanan", "bullets"], i)}
+                    className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
+                  </button>
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Poin"
+              onAdd={() => addArrayItem(["layanan", "bullets"], "Poin baru")}
+            />
+            <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
+              Tombol CTA & WhatsApp
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field
+                label="Teks tombol CTA"
+                value={content.layanan.ctaLabel}
+                onChange={(v) => update(["layanan", "ctaLabel"], v)}
+              />
+              <Field
+                label="Nomor WhatsApp tujuan"
+                value={content.layanan.waNumber}
+                onChange={(v) => update(["layanan", "waNumber"], v)}
+                hint="Contoh: 6281234567890 (pakai kode negara 62, tanpa spasi/tanda +). Kosongkan untuk pakai nomor WA Footer."
+              />
+            </div>
+            <Field
+              label="Pesan otomatis WhatsApp"
+              value={content.layanan.waMessage}
+              onChange={(v) => update(["layanan", "waMessage"], v)}
+              textarea
+              hint="Pesan ini otomatis terisi saat pengunjung klik tombol dan chat WA terbuka."
+            />
+
+            <MediaField
+              label="Gambar / video (sisi kanan section)"
+              value={content.layanan.media}
+              onChange={(v) => update(["layanan", "media"], v)}
+              uploading={layananMediaUploading}
+              onUploadFile={uploadLayananMedia}
+            />
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "tentang" && (
+        <div className="space-y-6">
+          {/* Tentang */}
+          <Section
+            title="Section Tentang Kami"
+            onSave={() => saveSection("tentang", { tentang: content.tentang })}
+            saving={savingMap.tentang}
+            status={statusMap.tentang}>
+            <Field
+              label="Label kecil"
+              value={content.tentang.eyebrow}
+              onChange={(v) => update(["tentang", "eyebrow"], v)}
+            />
+            <Field
+              label="Judul"
+              value={content.tentang.title}
+              onChange={(v) => update(["tentang", "title"], v)}
+            />
+            <Field
+              label="Deskripsi"
+              value={content.tentang.description}
+              onChange={(v) => update(["tentang", "description"], v)}
+              textarea
+            />
+            <p className="text-sm font-semibold text-bark-700 mb-2">
+              Statistik (angka pencapaian)
+            </p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {content.tentang.stats.map((s, i) => (
+                <div key={i} className="border border-sand rounded-xl p-3">
+                  <Field
+                    label="Angka"
+                    value={s.value}
+                    onChange={(v) =>
+                      updateArrayItem(["tentang", "stats"], i, "value", v)
+                    }
+                  />
+                  <Field
+                    label="Label"
+                    value={s.label}
+                    onChange={(v) =>
+                      updateArrayItem(["tentang", "stats"], i, "label", v)
+                    }
+                  />
+                  {content.tentang.stats.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem(["tentang", "stats"], i)}
+                      className="text-xs px-3 py-1 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                      Hapus
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <AddRemove
+              addLabel="Tambah Statistik"
+              onAdd={() =>
+                addArrayItem(["tentang", "stats"], {
+                  value: "0",
+                  label: "Label baru",
+                })
               }
+            />
+
+            <MediaField
+              label="Gambar / video (sisi kiri section)"
+              value={content.tentang.media}
+              onChange={(v) => update(["tentang", "media"], v)}
+              uploading={tentangMediaUploading}
+              onUploadFile={uploadTentangMedia}
+            />
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "sliderLayanan" && (
+        <div className="space-y-6">
+          {/* Slider Layanan Optik Kayumanis */}
+          <Section
+            title="Slider Layanan Optik Kayumanis"
+            onSave={() =>
+              saveSection("layananSlider", {
+                layananSlider: content.layananSlider,
+              })
+            }
+            saving={savingMap.layananSlider}
+            status={statusMap.layananSlider}>
+            <Field
+              label="Judul"
+              value={content.layananSlider.title}
+              onChange={(v) => update(["layananSlider", "title"], v)}
+            />
+            <Field
+              label="Subjudul"
+              value={content.layananSlider.subtitle}
+              onChange={(v) => update(["layananSlider", "subtitle"], v)}
+              textarea
+            />
+            {content.layananSlider.items.map((item, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+                <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+                  Slide Layanan {i + 1}
+                </p>
+                <div className="flex items-center gap-4 mb-4">
+                  {item.image ? (
+                    <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
+                      <img
+                        src={item.image}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateArrayItem(
+                            ["layananSlider", "items"],
+                            i,
+                            "image",
+                            "",
+                          )
+                        }
+                        className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+                        aria-label="Hapus gambar">
+                        x
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+                      Belum ada
+                    </div>
+                  )}
+                  <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
+                    <span>
+                      {sliderUploading[`layananSlider-${i}`]
+                        ? "Mengunggah..."
+                        : item.image
+                          ? "Ganti Gambar"
+                          : "+ Upload Gambar"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={sliderUploading[`layananSlider-${i}`]}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadSliderImage("layananSlider", i, file);
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <Field
+                  label="Judul slide"
+                  value={item.title}
+                  onChange={(v) =>
+                    updateArrayItem(["layananSlider", "items"], i, "title", v)
+                  }
+                />
+                <Field
+                  label="Deskripsi slide"
+                  value={item.desc}
+                  onChange={(v) =>
+                    updateArrayItem(["layananSlider", "items"], i, "desc", v)
+                  }
+                  textarea
+                />
+                {content.layananSlider.items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeArrayItem(["layananSlider", "items"], i)
+                    }
+                    className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus Slide
+                  </button>
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Slide Layanan"
+              onAdd={() =>
+                addArrayItem(["layananSlider", "items"], {
+                  title: "Layanan baru",
+                  desc: "Deskripsi layanan baru",
+                  image: "",
+                })
+              }
+            />
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "sliderCabang" && (
+        <div className="space-y-6">
+          {/* Slider Cabang Optik Kayumanis */}
+          <Section
+            title="Slider Cabang Optik Kayumanis"
+            onSave={() => saveSection("cabang", { cabang: content.cabang })}
+            saving={savingMap.cabang}
+            status={statusMap.cabang}>
+            <Field
+              label="Judul"
+              value={content.cabang.title}
+              onChange={(v) => update(["cabang", "title"], v)}
+            />
+            <Field
+              label="Subjudul"
+              value={content.cabang.subtitle}
+              onChange={(v) => update(["cabang", "subtitle"], v)}
               textarea
             />
             <div className="grid sm:grid-cols-2 gap-3">
               <Field
-                label="Tombol utama & teks"
-                value={slide.ctaPrimaryLabel}
-                onChange={(v) =>
-                  updateArrayItem(["hero", "slides"], i, "ctaPrimaryLabel", v)
-                }
+                label="Teks tombol CTA"
+                value={content.cabang.ctaLabel}
+                onChange={(v) => update(["cabang", "ctaLabel"], v)}
               />
               <Field
-                label="Tombol utama & link"
-                hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
-                value={slide.ctaPrimaryHref}
-                onChange={(v) =>
-                  updateArrayItem(["hero", "slides"], i, "ctaPrimaryHref", v)
-                }
-              />
-              <Field
-                label="Tombol kedua & teks (kosongkan jika tidak perlu)"
-                value={slide.ctaSecondaryLabel}
-                onChange={(v) =>
-                  updateArrayItem(["hero", "slides"], i, "ctaSecondaryLabel", v)
-                }
-              />
-              <Field
-                label="Tombol kedua & link"
-                hint='Bisa path internal ("/shop"), anchor ("#layanan"), atau URL lengkap ("https://wa.me/62...")'
-                value={slide.ctaSecondaryHref}
-                onChange={(v) =>
-                  updateArrayItem(["hero", "slides"], i, "ctaSecondaryHref", v)
-                }
+                label="URL tombol CTA"
+                value={content.cabang.ctaHref}
+                onChange={(v) => update(["cabang", "ctaHref"], v)}
+                hint="Isi URL manual, misalnya link WhatsApp atau Google Maps."
               />
             </div>
+            {content.cabang.items.map((item, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+                <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+                  Slide Cabang {i + 1}
+                </p>
+                <div className="flex items-center gap-4 mb-4">
+                  {item.image ? (
+                    <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
+                      <img
+                        src={item.image}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateArrayItem(["cabang", "items"], i, "image", "")
+                        }
+                        className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+                        aria-label="Hapus gambar">
+                        x
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+                      Belum ada
+                    </div>
+                  )}
+                  <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
+                    <span>
+                      {sliderUploading[`cabang-${i}`]
+                        ? "Mengunggah..."
+                        : item.image
+                          ? "Ganti Gambar"
+                          : "+ Upload Gambar"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={sliderUploading[`cabang-${i}`]}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadSliderImage("cabang", i, file);
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <Field
+                  label="Nama cabang"
+                  value={item.title}
+                  onChange={(v) =>
+                    updateArrayItem(["cabang", "items"], i, "title", v)
+                  }
+                />
+                <Field
+                  label="Deskripsi / alamat"
+                  value={item.desc}
+                  onChange={(v) =>
+                    updateArrayItem(["cabang", "items"], i, "desc", v)
+                  }
+                  textarea
+                />
+                {content.cabang.items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["cabang", "items"], i)}
+                    className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus Slide
+                  </button>
+                )}
+              </div>
+            ))}
             <AddRemove
-              addLabel="Tambah Slide"
+              addLabel="Tambah Slide Cabang"
               onAdd={() =>
-                addArrayItem(["hero", "slides"], {
+                addArrayItem(["cabang", "items"], {
+                  title: "Cabang baru",
+                  desc: "Alamat cabang baru",
                   image: "",
-                  tag: "Label Baru",
-                  title: "Judul baru",
-                  desc: "Deskripsi baru",
-                  ctaPrimaryLabel: "Lihat Koleksi",
-                  ctaPrimaryHref: "/shop",
-                  ctaSecondaryLabel: "",
-                  ctaSecondaryHref: "",
-                })
-              }
-              onRemove={
-                content.hero.slides.length > 1
-                  ? () => removeArrayItem(["hero", "slides"], i)
-                  : null
-              }
-            />
-          </div>
-        ))}
-      </Section>
-
-      {/* Marquee */}
-      <Section
-        title="Teks Berjalan (Marquee)"
-        onSave={() => saveSection("marquee", { marquee: content.marquee })}
-        saving={savingMap.marquee}
-        status={statusMap.marquee}>
-        {content.marquee.map((item, i) => (
-          <div key={i} className="flex gap-2 mb-2">
-            <input
-              className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
-              value={item}
-              onChange={(e) =>
-                setContent((prev) => {
-                  const next = structuredClone(prev);
-                  next.marquee[i] = e.target.value;
-                  return next;
                 })
               }
             />
-            {content.marquee.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["marquee"], i)}
-                className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Teks"
-          onAdd={() => addArrayItem(["marquee"], "Teks baru")}
-        />
-      </Section>
+          </Section>
+        </div>
+      )}
 
-      {/* Value props */}
-      <Section
-        title='Section "Kenapa Optik Kayumanis"'
-        onSave={() =>
-          saveSection("valueProps", { valueProps: content.valueProps })
-        }
-        saving={savingMap.valueProps}
-        status={statusMap.valueProps}>
-        <Field
-          label="Label kecil"
-          value={content.valueProps.eyebrow}
-          onChange={(v) => update(["valueProps", "eyebrow"], v)}
-        />
-        <Field
-          label="Judul"
-          value={content.valueProps.title}
-          onChange={(v) => update(["valueProps", "title"], v)}
-        />
-        {content.valueProps.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-3">
+      {activeTab === "sponsor" && (
+        <div className="space-y-6">
+          {/* Sponsor */}
+          <Section
+            title="Slider Sponsor"
+            onSave={() =>
+              saveSection("sponsors", { sponsors: content.sponsors })
+            }
+            saving={savingMap.sponsors}
+            status={statusMap.sponsors}>
             <Field
-              label={`Kartu ${i + 1} & Judul`}
-              value={item.title}
-              onChange={(v) =>
-                updateArrayItem(["valueProps", "items"], i, "title", v)
-              }
+              label="Judul"
+              value={content.sponsors.title}
+              onChange={(v) => update(["sponsors", "title"], v)}
             />
             <Field
-              label={`Kartu ${i + 1} & Deskripsi`}
-              value={item.desc}
-              onChange={(v) =>
-                updateArrayItem(["valueProps", "items"], i, "desc", v)
-              }
+              label="Subjudul"
+              value={content.sponsors.subtitle}
+              onChange={(v) => update(["sponsors", "subtitle"], v)}
               textarea
             />
-            {content.valueProps.items.length > 1 && (
-              <AddRemove
-                addLabel=""
-                onAdd={() => {}}
-                onRemove={() => removeArrayItem(["valueProps", "items"], i)}
-              />
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Kartu"
-          onAdd={() =>
-            addArrayItem(["valueProps", "items"], {
-              title: "Judul baru",
-              desc: "Deskripsi baru",
-            })
-          }
-        />
-      </Section>
-
-      {/* Katalog */}
-      <Section
-        title="Section Katalog Produk (heading)"
-        onSave={() => saveSection("katalog", { katalog: content.katalog })}
-        saving={savingMap.katalog}
-        status={statusMap.katalog}>
-        <Field
-          label="Label kecil"
-          value={content.katalog.eyebrow}
-          onChange={(v) => update(["katalog", "eyebrow"], v)}
-        />
-        <Field
-          label="Judul"
-          value={content.katalog.title}
-          onChange={(v) => update(["katalog", "title"], v)}
-        />
-        <Field
-          label='Teks tombol "Lihat Semua"'
-          value={content.katalog.linkLabel}
-          onChange={(v) => update(["katalog", "linkLabel"], v)}
-        />
-        <p className="text-xs text-bark-300">
-          Kategori & jumlah produk otomatis dari menu Produk. Gambar tiap
-          kategori diatur di panel di bawah ini.
-        </p>
-      </Section>
-
-      <CategoryImagesPanel token={token} />
-
-      {/* Layanan */}
-      <Section
-        title="Section Layanan Periksa Mata"
-        onSave={() => saveSection("layanan", { layanan: content.layanan })}
-        saving={savingMap.layanan}
-        status={statusMap.layanan}>
-        <Field
-          label="Label kecil"
-          value={content.layanan.eyebrow}
-          onChange={(v) => update(["layanan", "eyebrow"], v)}
-        />
-        <Field
-          label="Judul"
-          value={content.layanan.title}
-          onChange={(v) => update(["layanan", "title"], v)}
-          textarea
-        />
-        <Field
-          label="Deskripsi"
-          value={content.layanan.description}
-          onChange={(v) => update(["layanan", "description"], v)}
-          textarea
-        />
-        <p className="text-sm font-semibold text-bark-700 mb-2">
-          Daftar poin (bullet)
-        </p>
-        {content.layanan.bullets.map((b, i) => (
-          <div key={i} className="flex gap-2 mb-2">
-            <input
-              className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
-              value={b}
-              onChange={(e) =>
-                setContent((prev) => {
-                  const next = structuredClone(prev);
-                  next.layanan.bullets[i] = e.target.value;
-                  return next;
+            {content.sponsors.items.map((item, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+                <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+                  Sponsor {i + 1}
+                </p>
+                <div className="flex items-center gap-4 mb-4">
+                  {item.image ? (
+                    <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0 bg-white">
+                      <img
+                        src={item.image}
+                        alt=""
+                        className="w-full h-full object-contain p-2"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateArrayItem(["sponsors", "items"], i, "image", "")
+                        }
+                        className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+                        aria-label="Hapus gambar">
+                        x
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+                      Belum ada
+                    </div>
+                  )}
+                  <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
+                    <span>
+                      {sliderUploading[`sponsors-${i}`]
+                        ? "Mengunggah..."
+                        : item.image
+                          ? "Ganti Foto"
+                          : "+ Upload Foto"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={sliderUploading[`sponsors-${i}`]}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadSliderImage("sponsors", i, file);
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <Field
+                  label="Nama sponsor"
+                  value={item.name || ""}
+                  onChange={(v) =>
+                    updateArrayItem(["sponsors", "items"], i, "name", v)
+                  }
+                />
+                {content.sponsors.items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["sponsors", "items"], i)}
+                    className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus Sponsor
+                  </button>
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Foto Sponsor"
+              onAdd={() =>
+                addArrayItem(["sponsors", "items"], {
+                  name: "Sponsor baru",
+                  image: "",
                 })
               }
             />
-            {content.layanan.bullets.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["layanan", "bullets"], i)}
-                className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Poin"
-          onAdd={() => addArrayItem(["layanan", "bullets"], "Poin baru")}
-        />
-        <div className="mt-4">
-          <Field
-            label="Teks tombol CTA"
-            value={content.layanan.ctaLabel}
-            onChange={(v) => update(["layanan", "ctaLabel"], v)}
-          />
+          </Section>
         </div>
+      )}
 
-        <MediaField
-          label="Gambar / video (sisi kanan section)"
-          value={content.layanan.media}
-          onChange={(v) => update(["layanan", "media"], v)}
-          uploading={layananMediaUploading}
-          onUploadFile={uploadLayananMedia}
-        />
-      </Section>
+      {activeTab === "kontak" && (
+        <div className="space-y-6">
+          {/* Kontak */}
+          <Section
+            title="Section Kontak"
+            onSave={() => saveSection("kontak", { kontak: content.kontak })}
+            saving={savingMap.kontak}
+            status={statusMap.kontak}>
+            <Field
+              label="Judul"
+              value={content.kontak.title}
+              onChange={(v) => update(["kontak", "title"], v)}
+            />
+            <Field
+              label="Subjudul"
+              value={content.kontak.subtitle}
+              onChange={(v) => update(["kontak", "subtitle"], v)}
+              textarea
+            />
+            <MediaField
+              label="Gambar di sisi kanan form"
+              value={content.kontak.image}
+              onChange={(v) => update(["kontak", "image"], v)}
+              uploading={kontakImageUploading}
+              onUploadFile={uploadKontakImage}
+            />
+          </Section>
+        </div>
+      )}
 
-      {/* Tentang */}
-      <Section
-        title="Section Tentang Kami"
-        onSave={() => saveSection("tentang", { tentang: content.tentang })}
-        saving={savingMap.tentang}
-        status={statusMap.tentang}>
-        <Field
-          label="Label kecil"
-          value={content.tentang.eyebrow}
-          onChange={(v) => update(["tentang", "eyebrow"], v)}
-        />
-        <Field
-          label="Judul"
-          value={content.tentang.title}
-          onChange={(v) => update(["tentang", "title"], v)}
-        />
-        <Field
-          label="Deskripsi"
-          value={content.tentang.description}
-          onChange={(v) => update(["tentang", "description"], v)}
-          textarea
-        />
-        <p className="text-sm font-semibold text-bark-700 mb-2">
-          Statistik (angka pencapaian)
-        </p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          {content.tentang.stats.map((s, i) => (
-            <div key={i} className="border border-sand rounded-xl p-3">
+      {activeTab === "footer" && (
+        <div className="space-y-6">
+          {/* Footer */}
+          <Section
+            title="Footer"
+            onSave={() => saveSection("footer", { footer: content.footer })}
+            saving={savingMap.footer}
+            status={statusMap.footer}>
+            <Field
+              label="Deskripsi singkat toko"
+              value={content.footer.description}
+              onChange={(v) => update(["footer", "description"], v)}
+              textarea
+            />
+            <div className="grid sm:grid-cols-2 gap-3">
               <Field
-                label="Angka"
-                value={s.value}
-                onChange={(v) =>
-                  updateArrayItem(["tentang", "stats"], i, "value", v)
-                }
+                label="Nomor WhatsApp (tampilan)"
+                value={content.footer.whatsappDisplay}
+                onChange={(v) => update(["footer", "whatsappDisplay"], v)}
               />
               <Field
-                label="Label"
-                value={s.label}
-                onChange={(v) =>
-                  updateArrayItem(["tentang", "stats"], i, "label", v)
-                }
+                label="Link WhatsApp (wa.me/...)"
+                value={content.footer.whatsappLink}
+                onChange={(v) => update(["footer", "whatsappLink"], v)}
               />
-              {content.tentang.stats.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeArrayItem(["tentang", "stats"], i)}
-                  className="text-xs px-3 py-1 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                  Hapus
-                </button>
-              )}
+              <Field
+                label="Email"
+                value={content.footer.email}
+                onChange={(v) => update(["footer", "email"], v)}
+              />
+              <Field
+                label="Alamat"
+                value={content.footer.address}
+                onChange={(v) => update(["footer", "address"], v)}
+              />
             </div>
-          ))}
-        </div>
-        <AddRemove
-          addLabel="Tambah Statistik"
-          onAdd={() =>
-            addArrayItem(["tentang", "stats"], {
-              value: "0",
-              label: "Label baru",
-            })
-          }
-        />
-
-        <MediaField
-          label="Gambar / video (sisi kiri section)"
-          value={content.tentang.media}
-          onChange={(v) => update(["tentang", "media"], v)}
-          uploading={tentangMediaUploading}
-          onUploadFile={uploadTentangMedia}
-        />
-      </Section>
-
-      {/* Slider Layanan Optik Kayumanis */}
-      <Section
-        title="Slider Layanan Optik Kayumanis"
-        onSave={() =>
-          saveSection("layananSlider", { layananSlider: content.layananSlider })
-        }
-        saving={savingMap.layananSlider}
-        status={statusMap.layananSlider}>
-        <Field
-          label="Judul"
-          value={content.layananSlider.title}
-          onChange={(v) => update(["layananSlider", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.layananSlider.subtitle}
-          onChange={(v) => update(["layananSlider", "subtitle"], v)}
-          textarea
-        />
-        {content.layananSlider.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Slide Layanan {i + 1}
+            <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
+              Jam operasional
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+            {content.footer.hours.map((h, i) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
+                  value={h}
+                  onChange={(e) =>
+                    setContent((prev) => {
+                      const next = structuredClone(prev);
+                      next.footer.hours[i] = e.target.value;
+                      return next;
+                    })
+                  }
+                />
+                {content.footer.hours.length > 1 && (
                   <button
                     type="button"
-                    onClick={() =>
-                      updateArrayItem(
-                        ["layananSlider", "items"],
-                        i,
-                        "image",
-                        "",
-                      )
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
+                    onClick={() => removeArrayItem(["footer", "hours"], i)}
+                    className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
                   </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`layananSlider-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`layananSlider-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("layananSlider", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <Field
-              label="Judul slide"
-              value={item.title}
-              onChange={(v) =>
-                updateArrayItem(["layananSlider", "items"], i, "title", v)
+                )}
+              </div>
+            ))}
+            <AddRemove
+              addLabel="Tambah Baris Jam"
+              onAdd={() =>
+                addArrayItem(
+                  ["footer", "hours"],
+                  "Setiap Hari: 09.00 â€“ 20.00",
+                )
               }
             />
-            <Field
-              label="Deskripsi slide"
-              value={item.desc}
-              onChange={(v) =>
-                updateArrayItem(["layananSlider", "items"], i, "desc", v)
-              }
-              textarea
-            />
-            {content.layananSlider.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["layananSlider", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Slide
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Slide Layanan"
-          onAdd={() =>
-            addArrayItem(["layananSlider", "items"], {
-              title: "Layanan baru",
-              desc: "Deskripsi layanan baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
 
-      {/* Slider Cabang Optik Kayumanis */}
-      <Section
-        title="Slider Cabang Optik Kayumanis"
-        onSave={() => saveSection("cabang", { cabang: content.cabang })}
-        saving={savingMap.cabang}
-        status={statusMap.cabang}>
-        <Field
-          label="Judul"
-          value={content.cabang.title}
-          onChange={(v) => update(["cabang", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.cabang.subtitle}
-          onChange={(v) => update(["cabang", "subtitle"], v)}
-          textarea
-        />
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field
-            label="Teks tombol CTA"
-            value={content.cabang.ctaLabel}
-            onChange={(v) => update(["cabang", "ctaLabel"], v)}
-          />
-          <Field
-            label="URL tombol CTA"
-            value={content.cabang.ctaHref}
-            onChange={(v) => update(["cabang", "ctaHref"], v)}
-            hint="Isi URL manual, misalnya link WhatsApp atau Google Maps."
-          />
-        </div>
-        {content.cabang.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Slide Cabang {i + 1}
+            <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
+              Link Media Sosial
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(["cabang", "items"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`cabang-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`cabang-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("cabang", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <Field
+                label="Instagram"
+                value={content.footer.socials.instagram}
+                onChange={(v) => update(["footer", "socials", "instagram"], v)}
+                hint="Contoh: instagram.com/optikkayumanis"
+              />
+              <Field
+                label="Facebook"
+                value={content.footer.socials.facebook}
+                onChange={(v) => update(["footer", "socials", "facebook"], v)}
+                hint="Contoh: facebook.com/optikkayumanis"
+              />
+              <Field
+                label="TikTok"
+                value={content.footer.socials.tiktok}
+                onChange={(v) => update(["footer", "socials", "tiktok"], v)}
+                hint="Contoh: tiktok.com/@optikkayumanis"
+              />
             </div>
-            <Field
-              label="Nama cabang"
-              value={item.title}
-              onChange={(v) =>
-                updateArrayItem(["cabang", "items"], i, "title", v)
-              }
-            />
-            <Field
-              label="Deskripsi / alamat"
-              value={item.desc}
-              onChange={(v) =>
-                updateArrayItem(["cabang", "items"], i, "desc", v)
-              }
-              textarea
-            />
-            {content.cabang.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["cabang", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Slide
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Slide Cabang"
-          onAdd={() =>
-            addArrayItem(["cabang", "items"], {
-              title: "Cabang baru",
-              desc: "Alamat cabang baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
 
-      {/* Sponsor */}
-      <Section
-        title="Slider Sponsor"
-        onSave={() => saveSection("sponsors", { sponsors: content.sponsors })}
-        saving={savingMap.sponsors}
-        status={statusMap.sponsors}>
-        <Field
-          label="Judul"
-          value={content.sponsors.title}
-          onChange={(v) => update(["sponsors", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.sponsors.subtitle}
-          onChange={(v) => update(["sponsors", "subtitle"], v)}
-          textarea
-        />
-        {content.sponsors.items.map((item, i) => (
-          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
-            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
-              Sponsor {i + 1}
+            <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
+              Lokasi Peta
             </p>
-            <div className="flex items-center gap-4 mb-4">
-              {item.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0 bg-white">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full h-full object-contain p-2"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(["sponsors", "items"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    x
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {sliderUploading[`sponsors-${i}`]
-                    ? "Mengunggah..."
-                    : item.image
-                      ? "Ganti Foto"
-                      : "+ Upload Foto"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={sliderUploading[`sponsors-${i}`]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSliderImage("sponsors", i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
             <Field
-              label="Nama sponsor"
-              value={item.name || ""}
-              onChange={(v) =>
-                updateArrayItem(["sponsors", "items"], i, "name", v)
-              }
+              label="Alamat atau link sematkan Google Maps"
+              value={content.footer.mapEmbed || ""}
+              onChange={(v) => update(["footer", "mapEmbed"], v)}
+              hint='Isi alamat toko (mis. "Optik Kayumanis, Jl. Kayumanis No 12, Bogor"), atau tempel link dari Google Maps â†’ Bagikan â†’ Sematkan peta â†’ salin src iframe-nya untuk kontrol titik lokasi yang presisi.'
             />
-            {content.sponsors.items.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["sponsors", "items"], i)}
-                className="text-xs px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus Sponsor
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Foto Sponsor"
-          onAdd={() =>
-            addArrayItem(["sponsors", "items"], {
-              name: "Sponsor baru",
-              image: "",
-            })
-          }
-        />
-      </Section>
 
-      {/* Kontak */}
-      <Section
-        title="Section Kontak"
-        onSave={() => saveSection("kontak", { kontak: content.kontak })}
-        saving={savingMap.kontak}
-        status={statusMap.kontak}>
-        <Field
-          label="Judul"
-          value={content.kontak.title}
-          onChange={(v) => update(["kontak", "title"], v)}
-        />
-        <Field
-          label="Subjudul"
-          value={content.kontak.subtitle}
-          onChange={(v) => update(["kontak", "subtitle"], v)}
-          textarea
-        />
-        <MediaField
-          label="Gambar di sisi kanan form"
-          value={content.kontak.image}
-          onChange={(v) => update(["kontak", "image"], v)}
-          uploading={kontakImageUploading}
-          onUploadFile={uploadKontakImage}
-        />
-      </Section>
-      {/* Footer */}
-      <Section
-        title="Footer"
-        onSave={() => saveSection("footer", { footer: content.footer })}
-        saving={savingMap.footer}
-        status={statusMap.footer}>
-        <Field
-          label="Deskripsi singkat toko"
-          value={content.footer.description}
-          onChange={(v) => update(["footer", "description"], v)}
-          textarea
-        />
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field
-            label="Nomor WhatsApp (tampilan)"
-            value={content.footer.whatsappDisplay}
-            onChange={(v) => update(["footer", "whatsappDisplay"], v)}
-          />
-          <Field
-            label="Link WhatsApp (wa.me/...)"
-            value={content.footer.whatsappLink}
-            onChange={(v) => update(["footer", "whatsappLink"], v)}
-          />
-          <Field
-            label="Email"
-            value={content.footer.email}
-            onChange={(v) => update(["footer", "email"], v)}
-          />
-          <Field
-            label="Alamat"
-            value={content.footer.address}
-            onChange={(v) => update(["footer", "address"], v)}
-          />
-        </div>
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Jam operasional
-        </p>
-        {content.footer.hours.map((h, i) => (
-          <div key={i} className="flex gap-2 mb-2">
-            <input
-              className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm"
-              value={h}
-              onChange={(e) =>
-                setContent((prev) => {
-                  const next = structuredClone(prev);
-                  next.footer.hours[i] = e.target.value;
-                  return next;
-                })
-              }
+            <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
+              Teks Hak Cipta (bawah footer)
+            </p>
+            <Field
+              label="Teks setelah tahun"
+              value={content.footer.copyrightText || ""}
+              onChange={(v) => update(["footer", "copyrightText"], v)}
+              hint='Tahun berjalan ditambahkan otomatis di depan. Contoh hasil: "Â© 2026 Optik Kayumanis. Seluruh hak cipta dilindungi."'
             />
-            {content.footer.hours.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeArrayItem(["footer", "hours"], i)}
-                className="text-xs px-3 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
-                Hapus
-              </button>
-            )}
-          </div>
-        ))}
-        <AddRemove
-          addLabel="Tambah Baris Jam"
-          onAdd={() =>
-            addArrayItem(["footer", "hours"], "Setiap Hari: 09.00 â€“ 20.00")
-          }
-        />
-
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Link Media Sosial
-        </p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          <Field
-            label="Instagram"
-            value={content.footer.socials.instagram}
-            onChange={(v) => update(["footer", "socials", "instagram"], v)}
-            hint="Contoh: instagram.com/optikkayumanis"
-          />
-          <Field
-            label="Facebook"
-            value={content.footer.socials.facebook}
-            onChange={(v) => update(["footer", "socials", "facebook"], v)}
-            hint="Contoh: facebook.com/optikkayumanis"
-          />
-          <Field
-            label="TikTok"
-            value={content.footer.socials.tiktok}
-            onChange={(v) => update(["footer", "socials", "tiktok"], v)}
-            hint="Contoh: tiktok.com/@optikkayumanis"
-          />
+          </Section>
         </div>
-
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Lokasi Peta
-        </p>
-        <Field
-          label="Alamat atau link sematkan Google Maps"
-          value={content.footer.mapEmbed || ""}
-          onChange={(v) => update(["footer", "mapEmbed"], v)}
-          hint='Isi alamat toko (mis. "Optik Kayumanis, Jl. Kayumanis No 12, Bogor"), atau tempel link dari Google Maps â†’ Bagikan â†’ Sematkan peta â†’ salin src iframe-nya untuk kontrol titik lokasi yang presisi.'
-        />
-
-        <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
-          Teks Hak Cipta (bawah footer)
-        </p>
-        <Field
-          label="Teks setelah tahun"
-          value={content.footer.copyrightText || ""}
-          onChange={(v) => update(["footer", "copyrightText"], v)}
-          hint='Tahun berjalan ditambahkan otomatis di depan. Contoh hasil: "Â© 2026 Optik Kayumanis. Seluruh hak cipta dilindungi."'
-        />
-      </Section>
+      )}
     </div>
   );
 }
