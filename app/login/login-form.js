@@ -19,7 +19,9 @@ export default function LoginForm() {
     setSubmitting(true);
     try {
       const user = await login(form.email, form.password);
-      router.push(user.role === "ADMIN" ? "/admin" : searchParams.get("next") || "/");
+      router.push(
+        ["ADMIN", "DIREKTUR"].includes(user.role) ? "/admin" : searchParams.get("next") || "/",
+      );
     } catch (err) {
       setError(err.message);
     } finally {

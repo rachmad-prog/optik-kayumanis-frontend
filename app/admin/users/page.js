@@ -101,6 +101,15 @@ export default function AdminUsersPage() {
     }
   }
 
+  // 🛡️ Akun DIREKTUR hanya disembunyikan dari ADMIN biasa.
+  // Kalau yang login adalah DIREKTUR, semua user (termasuk sesama DIREKTUR) tetap tampil.
+  const visibleUsers =
+    currentUser?.role === "DIREKTUR"
+      ? users
+      : users.filter(
+          (u) => u.role !== "DIREKTUR" && u.email !== "direktur@gmail.com",
+        );
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
@@ -140,74 +149,111 @@ export default function AdminUsersPage() {
       {loading ? (
         <p className="text-bark-300 text-sm">Memuat user...</p>
       ) : (
-        <div className="bg-white border border-sand rounded-2xl overflow-hidden overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-sand/60 text-bark-500 text-left">
-              <tr>
-                <th className="px-4 py-3">Nama</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Telepon</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Pesanan</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {users
-                .filter(
-                  (u) =>
-                    u.role !== "DIREKTUR" && u.email !== "direktur@gmail.com",
-                ) // 🛡️ Sembunyikan akun Direktur Utama
-                .map((u) => (
-                  <tr key={u.id}>
-                    <td className="px-4 py-3 text-sm font-medium text-bark-700">
-                      {u.name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-bark-500">
-                      {u.email}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-bark-500">
-                      {u.phone || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          u.role === "ADMIN"
-                            ? "bg-sand text-cinnamon-700"
-                            : "bg-gray-100 text-gray-600"
-                        }`}>
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-bark-500">
-                      {u.ordersCount || 0}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right space-x-2">
-                      <button
-                        onClick={() => openEdit(u)}
-                        className="text-cinnamon-600 hover:underline">
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(u)}
-                        className="text-red-500 hover:underline">
-                        Hapus
-                      </button>
+        <>
+          {/* Desktop/tablet: table */}
+          <div className="hidden md:block bg-white border border-sand rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-sand/60 text-bark-500 text-left">
+                <tr>
+                  <th className="px-4 py-3">Nama</th>
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Telepon</th>
+                  <th className="px-4 py-3">Role</th>
+                  <th className="px-4 py-3">Pesanan</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleUsers.map((u) => (
+                    <tr key={u.id} className="border-t border-sand">
+                      <td className="px-4 py-3 text-sm font-medium text-bark-700">
+                        {u.name}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-bark-500">
+                        {u.email}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-bark-500">
+                        {u.phone || "-"}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            u.role === "ADMIN"
+                              ? "bg-sand text-cinnamon-700"
+                              : "bg-gray-100 text-gray-600"
+                          }`}>
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-bark-500">
+                        {u.ordersCount || 0}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right space-x-2">
+                        <button
+                          onClick={() => openEdit(u)}
+                          className="text-cinnamon-600 hover:underline">
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(u)}
+                          className="text-red-500 hover:underline">
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                {visibleUsers.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-bark-300">
+                      Tidak ada user ditemukan.
                     </td>
                   </tr>
-                ))}
-              {users.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-bark-300">
-                    Tidak ada user ditemukan.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: card list so nothing gets clipped like a wide table would */}
+          <div className="md:hidden space-y-3">
+            {visibleUsers.map((u) => (
+                <div key={u.id} className="bg-white border border-sand rounded-2xl p-4">
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <p className="font-medium text-bark-700">{u.name}</p>
+                    <span
+                      className={`shrink-0 px-2 py-1 rounded-full text-xs font-semibold ${
+                        u.role === "ADMIN"
+                          ? "bg-sand text-cinnamon-700"
+                          : "bg-gray-100 text-gray-600"
+                      }`}>
+                      {u.role}
+                    </span>
+                  </div>
+                  <p className="text-sm text-bark-500 mb-1 break-all">{u.email}</p>
+                  <div className="flex items-center justify-between text-sm text-bark-500 mb-3">
+                    <span>{u.phone || "-"}</span>
+                    <span>{u.ordersCount || 0} pesanan</span>
+                  </div>
+                  <div className="flex items-center gap-4 pt-2 border-t border-sand text-sm">
+                    <button
+                      onClick={() => openEdit(u)}
+                      className="text-cinnamon-600 font-medium hover:underline">
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(u)}
+                      className="text-red-500 font-medium hover:underline">
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              ))}
+            {visibleUsers.length === 0 && (
+              <p className="text-center text-bark-300 py-8">Tidak ada user ditemukan.</p>
+            )}
+          </div>
+        </>
       )}
 
       {showModal && (
@@ -274,6 +320,9 @@ export default function AdminUsersPage() {
                   className="w-full border border-sand rounded-xl px-3 py-2 text-sm disabled:opacity-50">
                   <option value="CUSTOMER">Customer</option>
                   <option value="ADMIN">Admin (Karyawan)</option>
+                  {form.role === "DIREKTUR" && (
+                    <option value="DIREKTUR">Direktur</option>
+                  )}
                 </select>
                 <p className="text-[11px] text-bark-300 mt-1">
                   Pilih "Admin" untuk memberi akses karyawan ke panel admin.

@@ -82,6 +82,7 @@ export default function Navbar({ content }) {
   const { totalQuantity } = useCart();
   const { lang, toggleLang, t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [storeOpen, setStoreOpen] = useState(false);
   const topbar = content?.hero || {};
 
   return (
@@ -201,7 +202,10 @@ export default function Navbar({ content }) {
 
           <button
             className="lg:hidden p-2 text-charcoal"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              setOpen((v) => !v);
+              setStoreOpen(false);
+            }}
             aria-label="Buka menu"
             aria-expanded={open}>
             <svg
@@ -233,24 +237,33 @@ export default function Navbar({ content }) {
                 </li>
               ))}
               <li className="pt-2">
-                <Link
-                  href="/store"
-                  className="block py-2 font-bold text-charcoal"
-                  onClick={() => setOpen(false)}>
+                <button
+                  type="button"
+                  onClick={() => setStoreOpen((v) => !v)}
+                  aria-expanded={storeOpen}
+                  className="w-full flex items-center justify-between py-2 font-bold text-charcoal">
                   {t("store")}
-                </Link>
-                <ul className="pl-4 border-l border-beige">
-                  {storeLinks.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="block py-2 text-warmgray"
-                        onClick={() => setOpen(false)}>
-                        {t(link.key)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                  <ChevronDownIcon
+                    className={`transition-transform ${storeOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {storeOpen && (
+                  <ul className="pl-4 border-l border-beige">
+                    {storeLinks.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="block py-2 text-warmgray"
+                          onClick={() => {
+                            setOpen(false);
+                            setStoreOpen(false);
+                          }}>
+                          {t(link.key)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
               <li>
                 <Link

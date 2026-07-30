@@ -77,6 +77,12 @@ export default function CheckoutPage() {
           onClose: () =>
             setError("Kamu menutup jendela pembayaran sebelum selesai."),
         });
+      } else {
+        // Order was already created on the backend, but the payment popup
+        // script isn't ready — don't leave the customer wondering what happened.
+        setError(
+          "Pesanan berhasil dibuat, tapi jendela pembayaran gagal dimuat. Silakan muat ulang halaman ini dan cek riwayat pesanan di akun kamu.",
+        );
       }
     } catch (err) {
       setError(err.message);

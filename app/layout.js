@@ -3,9 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { CartProvider } from "../context/CartContext";
 import { LanguageProvider } from "../context/LanguageContext";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import WhatsAppButton from "../components/WhatsAppButton";
+import SiteChrome from "../components/SiteChrome";
 import Script from "next/script";
 import { api } from "../lib/api";
 import { DEFAULT_CONTENT } from "../lib/defaultContent";
@@ -43,16 +41,19 @@ export default async function RootLayout({ children }) {
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>
-              <Navbar content={content} />
-              <main className="flex-1">{children}</main>
-              <Footer content={content} />
-              <WhatsAppButton />
+              <SiteChrome content={content}>{children}</SiteChrome>
             </CartProvider>
           </AuthProvider>
         </LanguageProvider>
-        {/* Midtrans Snap.js — needed on checkout page to open the payment popup */}
+        {/* Midtrans Snap.js — needed on checkout page to open the payment popup.
+            Must match the backend's MIDTRANS_IS_PRODUCTION flag (utils/midtrans.js),
+            otherwise a production Snap token gets opened with the sandbox script (or vice versa). */}
         <Script
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          src={
+            process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
+              ? "https://app.midtrans.com/snap/snap.js"
+              : "https://app.sandbox.midtrans.com/snap/snap.js"
+          }
           data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
           strategy="afterInteractive"
         />

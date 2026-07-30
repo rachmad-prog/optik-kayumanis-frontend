@@ -52,50 +52,83 @@ export default function AdminProductsPage() {
       ) : error ? (
         <p className="text-red-500 text-sm">{error}</p>
       ) : (
-        <div className="bg-white border border-sand rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-sand/60 text-bark-500 text-left">
-              <tr>
-                <th className="px-4 py-3">Nama</th>
-                <th className="px-4 py-3">Kategori</th>
-                <th className="px-4 py-3">Harga</th>
-                <th className="px-4 py-3">Stok</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id} className="border-t border-sand">
-                  <td className="px-4 py-3 text-bark-700 font-medium">{p.name}</td>
-                  <td className="px-4 py-3 text-bark-500">{p.category?.name}</td>
-                  <td className="px-4 py-3 font-mono text-cinnamon-600">{formatRupiah(p.price)}</td>
-                  <td className="px-4 py-3">{p.stock}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-1 rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                      {p.isActive ? "Aktif" : "Nonaktif"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right space-x-3">
-                    <Link href={`/admin/products/${p.id}/edit`} className="text-cinnamon-600 hover:underline">
-                      Edit
-                    </Link>
-                    <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:underline">
-                      Hapus
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {products.length === 0 && (
+        <>
+          {/* Desktop/tablet: table */}
+          <div className="hidden md:block bg-white border border-sand rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-sand/60 text-bark-500 text-left">
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-bark-300">
-                    Belum ada produk.
-                  </td>
+                  <th className="px-4 py-3">Nama</th>
+                  <th className="px-4 py-3">Kategori</th>
+                  <th className="px-4 py-3">Harga</th>
+                  <th className="px-4 py-3">Stok</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {products.map((p) => (
+                  <tr key={p.id} className="border-t border-sand">
+                    <td className="px-4 py-3 text-bark-700 font-medium">{p.name}</td>
+                    <td className="px-4 py-3 text-bark-500">{p.category?.name}</td>
+                    <td className="px-4 py-3 font-mono text-cinnamon-600">{formatRupiah(p.price)}</td>
+                    <td className="px-4 py-3">{p.stock}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-1 rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                        {p.isActive ? "Aktif" : "Nonaktif"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right space-x-3">
+                      <Link href={`/admin/products/${p.id}/edit`} className="text-cinnamon-600 hover:underline">
+                        Edit
+                      </Link>
+                      <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:underline">
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-bark-300">
+                      Belum ada produk.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: card list so nothing gets clipped like a wide table would */}
+          <div className="md:hidden space-y-3">
+            {products.map((p) => (
+              <div key={p.id} className="bg-white border border-sand rounded-2xl p-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <p className="font-medium text-bark-700">{p.name}</p>
+                  <span className={`shrink-0 text-xs px-2 py-1 rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                    {p.isActive ? "Aktif" : "Nonaktif"}
+                  </span>
+                </div>
+                <p className="text-sm text-bark-500 mb-2">{p.category?.name}</p>
+                <div className="flex items-center justify-between text-sm mb-3">
+                  <span className="font-mono text-cinnamon-600">{formatRupiah(p.price)}</span>
+                  <span className="text-bark-500">Stok: {p.stock}</span>
+                </div>
+                <div className="flex items-center gap-4 pt-2 border-t border-sand text-sm">
+                  <Link href={`/admin/products/${p.id}/edit`} className="text-cinnamon-600 font-medium hover:underline">
+                    Edit
+                  </Link>
+                  <button onClick={() => handleDelete(p.id)} className="text-red-500 font-medium hover:underline">
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            ))}
+            {products.length === 0 && (
+              <p className="text-center text-bark-300 py-8">Belum ada produk.</p>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
