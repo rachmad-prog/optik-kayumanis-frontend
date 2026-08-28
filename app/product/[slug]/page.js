@@ -52,10 +52,30 @@ export default async function ProductDetailPage({ params }) {
               <dd className="text-bark-700 font-medium">{product.frameShape}</dd>
             </div>
           )}
+          {product.color && (
+            <div>
+              <dt className="text-bark-300 uppercase text-xs tracking-wide">Warna</dt>
+              <dd className="text-bark-700 font-medium">{product.color}</dd>
+            </div>
+          )}
           {product.frameMaterial && (
             <div>
               <dt className="text-bark-300 uppercase text-xs tracking-wide">Material</dt>
               <dd className="text-bark-700 font-medium">{product.frameMaterial}</dd>
+            </div>
+          )}
+          {(product.lensWidth || product.bridgeWidth || product.templeLength) && (
+            <div>
+              <dt className="text-bark-300 uppercase text-xs tracking-wide">Ukuran</dt>
+              <dd className="text-bark-700 font-medium">
+                {[
+                  product.lensWidth ? `Lensa ${product.lensWidth}mm` : null,
+                  product.bridgeWidth ? `Bridge ${product.bridgeWidth}mm` : null,
+                  product.templeLength ? `Gagang ${product.templeLength}mm` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </dd>
             </div>
           )}
           <div>

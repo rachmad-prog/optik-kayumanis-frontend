@@ -15,9 +15,39 @@ const emptyForm = {
   categoryId: "",
   frameShape: "",
   frameMaterial: "",
+  color: "",
+  lensWidth: "",
+  bridgeWidth: "",
+  templeLength: "",
   isActive: true,
   isFeatured: false,
 };
+
+const FRAME_SHAPES = ["Cat Eye", "Kotak", "Bulat", "Oval"];
+
+const FRAME_COLORS = [
+  "Hitam Glossy",
+  "Hitam Doff",
+  "Peach",
+  "Bening/Transparan",
+  "Abu",
+  "Coklat",
+  "Coklat Susu",
+  "Hijau",
+  "Ungu",
+  "Pink",
+  "Gradasi",
+  "Biru",
+  "Navy",
+];
+
+const FRAME_MATERIALS = [
+  "Acetate Premium",
+  "Titanium",
+  "Besi",
+  "Plastik Kombinasi Besi",
+  "Plastik Elastis",
+];
 
 export default function ProductForm({ initialProduct = null }) {
   const { token } = useAuth();
@@ -49,6 +79,10 @@ export default function ProductForm({ initialProduct = null }) {
         categoryId: initialProduct.categoryId,
         frameShape: initialProduct.frameShape || "",
         frameMaterial: initialProduct.frameMaterial || "",
+        color: initialProduct.color || "",
+        lensWidth: initialProduct.lensWidth ?? "",
+        bridgeWidth: initialProduct.bridgeWidth ?? "",
+        templeLength: initialProduct.templeLength ?? "",
         isActive: initialProduct.isActive,
         isFeatured: initialProduct.isFeatured,
       });
@@ -121,6 +155,10 @@ export default function ProductForm({ initialProduct = null }) {
         categoryId: form.categoryId,
         frameShape: form.frameShape || undefined,
         frameMaterial: form.frameMaterial || undefined,
+        color: form.color || undefined,
+        lensWidth: form.lensWidth ? Number(form.lensWidth) : null,
+        bridgeWidth: form.bridgeWidth ? Number(form.bridgeWidth) : null,
+        templeLength: form.templeLength ? Number(form.templeLength) : null,
         isActive: form.isActive,
         isFeatured: form.isFeatured,
         images,
@@ -232,25 +270,95 @@ export default function ProductForm({ initialProduct = null }) {
         </select>
       </div>
 
+      <div>
+        <label className="block text-sm text-bark-500 mb-2">Ukuran (mm, opsional)</label>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs text-bark-400 mb-1">Lebar Lensa</label>
+            <input
+              type="number"
+              name="lensWidth"
+              value={form.lensWidth}
+              onChange={handleChange}
+              min="0"
+              step="0.1"
+              placeholder="mm"
+              className="w-full border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-bark-400 mb-1">Lebar Bridge</label>
+            <input
+              type="number"
+              name="bridgeWidth"
+              value={form.bridgeWidth}
+              onChange={handleChange}
+              min="0"
+              step="0.1"
+              placeholder="mm"
+              className="w-full border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-bark-400 mb-1">Panjang Gagang</label>
+            <input
+              type="number"
+              name="templeLength"
+              value={form.templeLength}
+              onChange={handleChange}
+              min="0"
+              step="0.1"
+              placeholder="mm"
+              className="w-full border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-bark-500 mb-1">Bentuk Frame (opsional)</label>
-          <input
+          <label className="block text-sm text-bark-500 mb-1">Bentuk (opsional)</label>
+          <select
             name="frameShape"
             value={form.frameShape}
             onChange={handleChange}
             className="w-full border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
-          />
+          >
+            <option value="">Pilih bentuk</option>
+            {FRAME_SHAPES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
         </div>
         <div>
-          <label className="block text-sm text-bark-500 mb-1">Material (opsional)</label>
-          <input
-            name="frameMaterial"
-            value={form.frameMaterial}
+          <label className="block text-sm text-bark-500 mb-1">Warna (opsional)</label>
+          <select
+            name="color"
+            value={form.color}
             onChange={handleChange}
             className="w-full border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
-          />
+          >
+            <option value="">Pilih warna</option>
+            {FRAME_COLORS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm text-bark-500 mb-1">Material (opsional)</label>
+        <select
+          name="frameMaterial"
+          value={form.frameMaterial}
+          onChange={handleChange}
+          className="w-full max-w-xs border border-sand rounded-xl px-4 py-3 focus:border-cinnamon-400 outline-none"
+        >
+          <option value="">Pilih material</option>
+          {FRAME_MATERIALS.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
       </div>
 
       <div>
