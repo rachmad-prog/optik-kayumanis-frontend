@@ -52,6 +52,17 @@ function UsersIcon(props) {
   );
 }
 
+function BankIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round" width="20" height="20" aria-hidden="true" {...props}>
+      <path d="M3 10 12 4l9 6" />
+      <path d="M5 10v9M9 10v9M15 10v9M19 10v9" />
+      <path d="M3 21h18" />
+    </svg>
+  );
+}
+
 function ContentIcon(props) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -78,6 +89,7 @@ const links = [
   { href: "/admin/products", label: "Produk", shortLabel: "Produk", icon: ProductIcon },
   { href: "/admin/orders", label: "Pesanan", shortLabel: "Pesanan", icon: OrdersIcon },
   { href: "/admin/users", label: "Kelola User", shortLabel: "User", icon: UsersIcon },
+  { href: "/admin/bank-accounts", label: "Rekening Bank", shortLabel: "Rekening", icon: BankIcon },
   { href: "/admin/content", label: "Konten Halaman", shortLabel: "Konten", icon: ContentIcon },
 ];
 
@@ -174,7 +186,7 @@ export default function AdminLayout({ children }) {
 
       {/* Bottom tab bar — mobile only, app-style navigation */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-sand pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {links.map((link) => {
             const Icon = link.icon;
             const active = pathname === link.href;
