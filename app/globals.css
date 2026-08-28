@@ -44,7 +44,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C5A059;
+  background: #F97316;
 }
 
 /* Hero carousel fade transition */
@@ -78,27 +78,27 @@ body {
 
 /* Badge Glow */
 .glow-champagne {
-  box-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
 }
 
 /* Gradient Mesh Background */
 .bg-mesh {
   background-color: #FAF9F6;
   background-image: 
-    radial-gradient(at 10% 20%, rgba(197, 160, 89, 0.08) 0px, transparent 50%),
+    radial-gradient(at 10% 20%, rgba(249, 115, 22, 0.08) 0px, transparent 50%),
     radial-gradient(at 90% 80%, rgba(15, 23, 42, 0.04) 0px, transparent 50%);
 }
 
 .bg-mesh-dark {
   background-color: #090D16;
   background-image: 
-    radial-gradient(at 20% 20%, rgba(197, 160, 89, 0.15) 0px, transparent 50%),
+    radial-gradient(at 20% 20%, rgba(249, 115, 22, 0.15) 0px, transparent 50%),
     radial-gradient(at 80% 80%, rgba(30, 41, 59, 0.5) 0px, transparent 50%);
 }
 
 /* Visible focus ring for accessibility */
 :focus-visible {
-  outline: 2px solid #C5A059;
+  outline: 2px solid #F97316;
   outline-offset: 2px;
 }
 
