@@ -270,7 +270,7 @@ function SponsorSlider({ sponsors }) {
               className="w-48 h-24 rounded-2xl border border-slate-800 bg-obsidian-950/80 backdrop-blur-md flex items-center justify-center p-5 shadow-lg"
             >
               {item.image ? (
-                <img src={item.image} alt={item.name || "Brand"} className="max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition duration-300" />
+                <img src={item.image} alt={item.name || "Brand"} className="max-w-full max-h-full object-contain" />
               ) : (
                 <span className="text-sm font-extrabold text-champagne tracking-wider">{item.name || "Brand"}</span>
               )}
