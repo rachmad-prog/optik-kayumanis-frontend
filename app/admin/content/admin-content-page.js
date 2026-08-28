@@ -5,6 +5,29 @@ import { useAuth } from "../../../context/AuthContext";
 import { api } from "../../../lib/api";
 import { DEFAULT_CONTENT } from "../../../lib/defaultContent";
 
+// Cloudflare R2's public URL can take a brief moment to become fetchable
+// right after a PutObject finishes (CDN/edge propagation). Rather than
+// pointing <img> straight at the brand-new URL and risking a broken-image
+// flash, we poll it in the background with a real Image() load and only
+// resolve once the browser can actually decode it — retrying a few times
+// with a short delay in between.
+function preloadImage(url, attempts = 8, intervalMs = 600) {
+  return new Promise((resolve, reject) => {
+    let tries = 0;
+    const tryLoad = () => {
+      tries += 1;
+      const img = new window.Image();
+      img.onload = () => resolve(url);
+      img.onerror = () => {
+        if (tries >= attempts) reject(new Error("timeout"));
+        else setTimeout(tryLoad, intervalMs);
+      };
+      img.src = url;
+    };
+    tryLoad();
+  });
+}
+
 function Field({ label, value, onChange, textarea, hint }) {
   return (
     <label className="block mb-4">
@@ -78,18 +101,44 @@ function AddRemove({ onAdd, onRemove, addLabel }) {
 }
 
 function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
+  // Local (blob:) preview of the file the admin just picked, shown instantly
+  // while the real upload + R2 preload happen in the background. Once the
+  // parent finishes (uploading flips back to false) it will have already
+  // swapped `image` to the final, verified R2 URL, so we drop the preview.
+  const [localPreview, setLocalPreview] = useState(null);
+
+  useEffect(() => {
+    if (!uploading && localPreview) {
+      URL.revokeObjectURL(localPreview);
+      setLocalPreview(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploading]);
+
+  const displayImage = localPreview || image;
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-semibold text-bark-700 mb-1">
         {label}
       </label>
       <div className="flex items-center gap-4">
-        {image ? (
+        {displayImage ? (
           <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-            <img src={image} alt="" className="w-full h-full object-cover" />
+            <img
+              src={displayImage}
+              alt=""
+              className="w-full h-full object-cover"
+            />
             <button
               type="button"
-              onClick={onRemove}
+              onClick={() => {
+                if (localPreview) {
+                  URL.revokeObjectURL(localPreview);
+                  setLocalPreview(null);
+                }
+                onRemove();
+              }}
               className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
               aria-label="Hapus gambar">
               x
@@ -104,7 +153,7 @@ function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
           <span>
             {uploading
               ? "Mengunggah..."
-              : image
+              : displayImage
                 ? "Ganti Gambar"
                 : "+ Upload Gambar"}
           </span>
@@ -114,7 +163,13 @@ function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
             disabled={uploading}
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) onUpload(file);
+              if (file) {
+                setLocalPreview((prev) => {
+                  if (prev) URL.revokeObjectURL(prev);
+                  return URL.createObjectURL(file);
+                });
+                onUpload(file);
+              }
               e.target.value = "";
             }}
             className="hidden"
@@ -143,6 +198,9 @@ function CategoryImagesPanel({ token }) {
   const [loading, setLoading] = useState(true);
   const [uploadingId, setUploadingId] = useState(null);
   const [statusById, setStatusById] = useState({});
+  // Local blob preview per category id, shown while the real upload + R2
+  // preload happen in the background (same fix as ImageUploadField).
+  const [previewMap, setPreviewMap] = useState({});
 
   useEffect(() => {
     api
@@ -155,13 +213,22 @@ function CategoryImagesPanel({ token }) {
   async function handleUpload(cat, file) {
     setUploadingId(cat.id);
     setStatusById((m) => ({ ...m, [cat.id]: null }));
+    const localPreview = URL.createObjectURL(file);
+    setPreviewMap((m) => ({ ...m, [cat.id]: localPreview }));
     try {
       const formData = new FormData();
       formData.append("files", file);
       const uploadData = await api.upload("/uploads", formData, token);
+      const url = uploadData.urls[0];
+      try {
+        await preloadImage(url);
+      } catch {
+        // Lanjutkan walau preload gagal — URL tetap valid, biasanya sudah
+        // bisa diakses beberapa saat kemudian (delay propagasi CDN).
+      }
       const { category } = await api.put(
         `/categories/${cat.id}`,
-        { imageUrl: uploadData.urls[0] },
+        { imageUrl: url },
         token,
       );
       setCategories((prev) =>
@@ -178,6 +245,12 @@ function CategoryImagesPanel({ token }) {
       }));
     } finally {
       setUploadingId(null);
+      setPreviewMap((m) => {
+        const next = { ...m };
+        if (next[cat.id]) URL.revokeObjectURL(next[cat.id]);
+        delete next[cat.id];
+        return next;
+      });
     }
   }
 
@@ -229,9 +302,9 @@ function CategoryImagesPanel({ token }) {
               key={cat.id}
               className="border border-sand rounded-xl overflow-hidden">
               <div className="relative h-32 bg-cream">
-                {cat.imageUrl ? (
+                {previewMap[cat.id] || cat.imageUrl ? (
                   <img
-                    src={cat.imageUrl}
+                    src={previewMap[cat.id] || cat.imageUrl}
                     alt={cat.name}
                     className="w-full h-full object-cover"
                   />
@@ -252,7 +325,7 @@ function CategoryImagesPanel({ token }) {
                 <label className="block text-center text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50 cursor-pointer">
                   {uploadingId === cat.id
                     ? "Mengunggah..."
-                    : cat.imageUrl
+                    : previewMap[cat.id] || cat.imageUrl
                       ? "Ganti Gambar"
                       : "+ Upload Gambar"}
                   <input
@@ -349,13 +422,23 @@ export default function AdminContentPage() {
   }
 
   // Uploads a single image for a hero slide and stores its URL on that slide.
+  // We wait for the R2 URL to actually be loadable before committing it to
+  // state — the ImageUploadField shows a local preview in the meantime, so
+  // the admin never sees a broken image while R2/CDN propagates.
   async function uploadSlideImage(i, file) {
     setSlideUploading((m) => ({ ...m, [i]: true }));
     try {
       const formData = new FormData();
       formData.append("files", file);
       const data = await api.upload("/uploads", formData, token);
-      updateArrayItem(["hero", "slides"], i, "image", data.urls[0]);
+      const url = data.urls[0];
+      try {
+        await preloadImage(url);
+      } catch {
+        // Lanjutkan walau preload gagal — URL tetap valid, biasanya sudah
+        // bisa diakses beberapa saat kemudian (delay propagasi CDN).
+      }
+      updateArrayItem(["hero", "slides"], i, "image", url);
     } catch (err) {
       setStatusMap((m) => ({
         ...m,
@@ -376,7 +459,14 @@ export default function AdminContentPage() {
       const formData = new FormData();
       formData.append("files", file);
       const data = await api.upload("/uploads", formData, token);
-      onUploaded(data.urls[0]);
+      const url = data.urls[0];
+      try {
+        await preloadImage(url);
+      } catch {
+        // Lanjutkan walau preload gagal — URL tetap valid, biasanya sudah
+        // bisa diakses beberapa saat kemudian (delay propagasi CDN).
+      }
+      onUploaded(url);
     } catch (err) {
       setStatusMap((m) => ({
         ...m,
@@ -468,54 +558,16 @@ export default function AdminContentPage() {
               Slide {i + 1}
             </p>
 
-            <label className="block text-sm font-semibold text-bark-700 mb-1">
-              Gambar Background
-            </label>
-            <div className="flex items-center gap-4 mb-4">
-              {slide.image ? (
-                <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-                  <img
-                    src={slide.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateArrayItem(["hero", "slides"], i, "image", "")
-                    }
-                    className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
-                    aria-label="Hapus gambar">
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
-                  Belum ada
-                </div>
-              )}
-              <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
-                <span>
-                  {slideUploading[i]
-                    ? "Mengunggah..."
-                    : slide.image
-                      ? "Ganti Gambar"
-                      : "+ Upload Gambar"}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={slideUploading[i]}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadSlideImage(i, file);
-                    e.target.value = "";
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <p className="text-xs text-bark-300 mb-4">
+            <ImageUploadField
+              label="Gambar Background"
+              image={slide.image}
+              uploading={slideUploading[i]}
+              onUpload={(file) => uploadSlideImage(i, file)}
+              onRemove={() =>
+                updateArrayItem(["hero", "slides"], i, "image", "")
+              }
+            />
+            <p className="text-xs text-bark-300 mb-4 -mt-2">
               Jika tidak diisi, slide memakai warna gradasi bawaan.
             </p>
 
