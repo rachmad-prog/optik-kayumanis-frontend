@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
@@ -319,6 +319,7 @@ function CategoryImagesPanel({ token }) {
 }
 
 const TABS = [
+  { id: "bankAccounts", label: "🏦 Rekening Bank Transfer" },
   { id: "topbar", label: "Topbar" },
   { id: "hero", label: "Hero / Banner Utama" },
   { id: "marquee", label: "Marquee" },
@@ -1528,7 +1529,77 @@ export default function AdminContentPage() {
               label="Teks setelah tahun"
               value={content.footer.copyrightText || ""}
               onChange={(v) => update(["footer", "copyrightText"], v)}
-              hint='Tahun berjalan ditambahkan otomatis di depan. Contoh hasil: "Â© 2026 Optik Kayumanis. Seluruh hak cipta dilindungi."'
+              hint='Tahun berjalan ditambahkan otomatis di depan. Contoh hasil: "© 2026 Optik Kayumanis. Seluruh hak cipta dilindungi."'
+            />
+          </Section>
+        </div>
+      )}
+
+      {activeTab === "bankAccounts" && (
+        <div className="space-y-6">
+          <Section
+            title="Kelola Rekening Bank Transfer Manual"
+            onSave={() =>
+              saveSection("bankAccounts", {
+                bankAccounts: content.bankAccounts || [],
+              })
+            }
+            saving={savingMap.bankAccounts}
+            status={statusMap.bankAccounts}>
+            <p className="text-xs text-bark-400 mb-4">
+              Tambahkan atau ubah rekening bank tujuan transfer pelanggan untuk transaksi pembayaran pesanan.
+            </p>
+            {(content.bankAccounts || []).map((bank, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4 bg-slate-50">
+                <p className="text-xs font-bold uppercase text-cinnamon-600 mb-3">
+                  Rekening Bank {i + 1}
+                </p>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <Field
+                    label="Nama Bank"
+                    value={bank.bankName}
+                    onChange={(v) =>
+                      updateArrayItem(["bankAccounts"], i, "bankName", v)
+                    }
+                    hint="Contoh: Bank BCA, Mandiri, BRI, BNI"
+                  />
+                  <Field
+                    label="Nomor Rekening"
+                    value={bank.accountNumber}
+                    onChange={(v) =>
+                      updateArrayItem(["bankAccounts"], i, "accountNumber", v)
+                    }
+                    hint="Contoh: 1234567890"
+                  />
+                  <Field
+                    label="Atas Nama (Pemilik)"
+                    value={bank.accountName}
+                    onChange={(v) =>
+                      updateArrayItem(["bankAccounts"], i, "accountName", v)
+                    }
+                    hint="Contoh: Optik Kayumanis"
+                  />
+                </div>
+                {(content.bankAccounts || []).length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["bankAccounts"], i)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50 mt-2">
+                    Hapus Rekening Ini
+                  </button>
+                )}
+              </div>
+            ))}
+
+            <AddRemove
+              addLabel="Tambah Rekening Bank Baru"
+              onAdd={() =>
+                addArrayItem(["bankAccounts"], {
+                  bankName: "Bank BCA",
+                  accountNumber: "0000000000",
+                  accountName: "Optik Kayumanis",
+                })
+              }
             />
           </Section>
         </div>

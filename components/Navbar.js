@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -26,40 +26,22 @@ function CartIcon(props) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      width="22"
-      height="22"
+      width="20"
+      height="20"
       aria-hidden="true"
-      {...props}>
-      <circle cx="9" cy="21" r="1" />
-      <circle cx="20" cy="21" r="1" />
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+      {...props}
+    >
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <path d="M16 10a4 4 0 0 1-8 0"></path>
     </svg>
   );
 }
 
 function GlobeIcon(props) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      width="15"
-      height="15"
-      aria-hidden="true"
-      {...props}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon(props) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -71,8 +53,11 @@ function ChevronDownIcon(props) {
       width="14"
       height="14"
       aria-hidden="true"
-      {...props}>
-      <path d="m6 9 6 6 6-6" />
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </svg>
   );
 }
@@ -86,133 +71,127 @@ export default function Navbar({ content }) {
   const topbar = content?.hero || {};
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* Top bar */}
-      <div className="bg-charcoal text-cream/80 text-xs">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-2 flex justify-between items-center gap-3">
-          <p className="hidden sm:block">{topbar.topbarLeft}</p>
-          <p className="mx-auto sm:mx-0 sm:mr-auto sm:ml-4 truncate">
-            {topbar.topbarRight}
+    <header className="sticky top-0 z-50 transition-all duration-300">
+      {/* Top Banner Bar */}
+      <div className="bg-obsidian text-slate-300 text-[11px] border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-1.5 flex justify-between items-center gap-3">
+          <p className="hidden sm:flex items-center gap-2 font-medium">
+            <span className="w-2 h-2 rounded-full bg-champagne animate-pulse" />
+            {topbar.topbarLeft || "Periksa Mata Gratis di Seluruh Cabang Kayumanis • Tren Frame 2026"}
+          </p>
+          <p className="mx-auto sm:mx-0 sm:mr-auto sm:ml-4 truncate font-medium text-slate-400">
+            {topbar.topbarRight || "Garansi Lensa Presisi 100% Original"}
           </p>
           <button
             onClick={toggleLang}
             aria-label="Switch language"
-            className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cream/20 hover:border-cream/50 hover:text-cream transition">
+            className="shrink-0 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800 hover:bg-champagne hover:text-obsidian text-slate-200 font-bold transition duration-200"
+          >
             <GlobeIcon />
-            <span className="font-semibold tracking-wide">
-              {lang === "en" ? "EN" : "ID"}
-            </span>
+            <span className="tracking-wider">{lang === "en" ? "EN" : "ID"}</span>
           </button>
         </div>
       </div>
 
-      {/* Main nav */}
-      <div className="bg-cream/95 backdrop-blur border-b border-beige">
-        <nav className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="w-10 h-10 rounded-full bg-cinnamon flex items-center justify-center text-cream font-bold text-lg">
+      {/* Main Glass Floating Nav */}
+      <div className="bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+        <nav className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-20">
+          {/* Brand Logo */}
+          <Link href="/" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-11 h-11 rounded-2xl bg-obsidian text-champagne font-extrabold text-xl flex items-center justify-center shadow-lg shadow-obsidian/20 group-hover:scale-105 transition-transform duration-300 border border-slate-800">
               OK
-            </span>
-            <span className="leading-tight">
-              <p className="font-extrabold text-lg tracking-tight text-charcoal">
+            </div>
+            <div className="leading-tight">
+              <span className="font-extrabold text-xl tracking-tight text-obsidian flex items-center gap-1">
                 Optik Kayumanis
-              </p>
-              <p className="text-[10px] uppercase tracking-widest text-warmgray">
-                Eyewear &amp; Eyecare
-              </p>
-            </span>
+                <span className="text-champagne font-light">.</span>
+              </span>
+              <span className="text-[10px] uppercase font-bold tracking-widest text-champagne-600 block">
+                Eyewear & Eyecare 2026
+              </span>
+            </div>
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-7 text-sm font-medium text-charcoal">
+          {/* Center Links */}
+          <ul className="hidden lg:flex items-center gap-8 text-xs uppercase font-extrabold tracking-wider text-slate-700">
             {mainNavLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="hover:text-cinnamon transition-colors">
+                  className="hover:text-champagne-600 transition-colors py-2 relative group"
+                >
                   {t(link.key)}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-champagne transition-all duration-300 group-hover:w-full" />
                 </Link>
               </li>
             ))}
-            <li className="relative group">
+            <li>
               <Link
                 href="/store"
-                className="inline-flex items-center gap-1.5 hover:text-cinnamon transition-colors">
-                {t("store")}
-                {/* <ChevronDownIcon /> */}
+                className="px-4 py-2 rounded-full bg-obsidian text-white hover:bg-champagne hover:text-obsidian transition-all shadow-md duration-300 flex items-center gap-1.5"
+              >
+                <span>✨ {t("store")} 2026</span>
               </Link>
-              {/* <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 absolute right-0 top-full pt-4 transition">
-                <ul className="w-52 rounded-xl border border-beige bg-cream shadow-xl p-2 text-sm">
-                  {storeLinks.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="block rounded-lg px-3 py-2 hover:bg-cinnamon/10 hover:text-cinnamon transition-colors">
-                        {t(link.key)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div> */}
             </li>
           </ul>
 
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Right Action Icons */}
+          <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/cart"
-              className="relative text-charcoal hover:text-cinnamon transition-colors"
-              aria-label={`${t("cart")}, ${totalQuantity} item`}>
+              className="relative p-2 rounded-full bg-slate-100 text-obsidian hover:bg-champagne-100 hover:text-champagne-700 transition-colors"
+              aria-label={`${t("cart")}, ${totalQuantity} item`}
+            >
               <CartIcon />
               {totalQuantity > 0 && (
-                <span className="absolute -top-2 -right-3 bg-cinnamon text-cream text-[11px] rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-champagne-gold text-obsidian text-[10px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                   {totalQuantity}
                 </span>
               )}
             </Link>
 
             {user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-full border border-slate-200">
                 <Link
                   href="/account"
-                  className="text-sm font-semibold text-charcoal hover:text-cinnamon">
+                  className="text-xs font-bold text-obsidian hover:text-champagne-600"
+                >
                   {t("hi")}, {user.name.split(" ")[0]}
                 </Link>
 
                 {(user.role === "ADMIN" || user.role === "DIREKTUR") && (
                   <Link
                     href="/admin"
-                    className="text-sm font-semibold text-cinnamon hover:text-cinnamon-700">
+                    className="text-xs font-bold text-champagne-600 hover:underline"
+                  >
                     {t("admin")}
                   </Link>
                 )}
 
                 <button
                   onClick={logout}
-                  className="text-sm font-semibold text-warmgray hover:text-cinnamon">
+                  className="text-xs font-semibold text-slate-400 hover:text-red-500 transition"
+                >
                   {t("logout")}
                 </button>
               </div>
             ) : (
               <Link
                 href="/login"
-                className="text-sm font-semibold px-4 py-2 rounded-full border border-charcoal/20 hover:border-cinnamon hover:text-cinnamon transition">
+                className="text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full border border-obsidian text-obsidian hover:bg-obsidian hover:text-white transition-all shadow-sm"
+              >
                 {t("login")}
               </Link>
             )}
           </div>
 
+          {/* Mobile Hamburger Menu Button */}
           <button
-            className="lg:hidden p-2 text-charcoal"
-            onClick={() => {
-              setOpen((v) => !v);
-              setStoreOpen(false);
-            }}
-            aria-label="Buka menu"
-            aria-expanded={open}>
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
+            className="lg:hidden p-2 rounded-xl bg-slate-100 text-obsidian"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Buka Menu Navigasi"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -223,54 +202,40 @@ export default function Navbar({ content }) {
           </button>
         </nav>
 
+        {/* Mobile Navigation Drawer */}
         {open && (
-          <div className="lg:hidden border-t border-beige bg-cream px-5 pb-4">
-            <ul className="flex flex-col gap-1 pt-2 text-sm font-medium text-charcoal">
+          <div className="lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-xl px-5 py-6 space-y-4 animate-fadeIn">
+            <ul className="flex flex-col gap-3 text-sm font-bold text-obsidian">
               {mainNavLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="block py-2"
-                    onClick={() => setOpen(false)}>
+                    className="block py-2 border-b border-slate-100 hover:text-champagne-600"
+                    onClick={() => setOpen(false)}
+                  >
                     {t(link.key)}
                   </Link>
                 </li>
               ))}
-              <li className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStoreOpen((v) => !v)}
-                  aria-expanded={storeOpen}
-                  className="w-full flex items-center justify-between py-2 font-bold text-charcoal">
-                  {t("store")}
-                  <ChevronDownIcon
-                    className={`transition-transform ${storeOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-                {storeOpen && (
-                  <ul className="pl-4 border-l border-beige">
-                    {storeLinks.map((link) => (
-                      <li key={link.href}>
-                        <Link
-                          href={link.href}
-                          className="block py-2 text-warmgray"
-                          onClick={() => {
-                            setOpen(false);
-                            setStoreOpen(false);
-                          }}>
-                          {t(link.key)}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <li>
+                <Link
+                  href="/store"
+                  className="block py-3 px-4 rounded-xl bg-obsidian text-white text-center font-extrabold"
+                  onClick={() => setOpen(false)}
+                >
+                  ✨ Katalog Store 2026
+                </Link>
               </li>
               <li>
                 <Link
                   href="/cart"
-                  className="block py-2"
-                  onClick={() => setOpen(false)}>
-                  {t("cart")} ({totalQuantity})
+                  className="flex items-center justify-between py-2 border-b border-slate-100"
+                  onClick={() => setOpen(false)}
+                >
+                  <span>{t("cart")}</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-champagne text-obsidian text-xs font-bold">
+                    {totalQuantity} item
+                  </span>
                 </Link>
               </li>
               {user ? (
@@ -278,27 +243,28 @@ export default function Navbar({ content }) {
                   <li>
                     <Link
                       href="/account"
-                      className="block py-2"
-                      onClick={() => setOpen(false)}>
+                      className="block py-2 text-slate-600"
+                      onClick={() => setOpen(false)}
+                    >
                       {t("myAccount")}
                     </Link>
                   </li>
-
                   {(user.role === "ADMIN" || user.role === "DIREKTUR") && (
                     <li>
                       <Link
                         href="/admin"
-                        className="block py-2 text-cinnamon"
-                        onClick={() => setOpen(false)}>
+                        className="block py-2 text-champagne-600 font-bold"
+                        onClick={() => setOpen(false)}
+                      >
                         {t("admin")}
                       </Link>
                     </li>
                   )}
-
                   <li>
                     <button
                       onClick={logout}
-                      className="text-left py-2 text-warmgray w-full">
+                      className="text-left py-2 text-red-500 font-semibold w-full"
+                    >
                       {t("logout")}
                     </button>
                   </li>
@@ -307,8 +273,9 @@ export default function Navbar({ content }) {
                 <li className="pt-2">
                   <Link
                     href="/login"
-                    className="block text-center py-2 rounded-full border border-charcoal/20 text-sm font-semibold"
-                    onClick={() => setOpen(false)}>
+                    className="block text-center py-3 rounded-xl border border-obsidian text-obsidian font-bold"
+                    onClick={() => setOpen(false)}
+                  >
                     {t("login")}
                   </Link>
                 </li>

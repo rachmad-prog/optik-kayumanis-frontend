@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DEFAULT_CONTENT } from "../lib/defaultContent";
 
-// Full URLs (https://wa.me/..., https://instagram.com/..., etc) are opened in a
-// new tab so visitors don't lose the store page; internal paths/anchors navigate normally.
 function isExternalHref(href) {
   return /^https?:\/\//i.test(href || "");
 }
@@ -15,38 +13,45 @@ export default function HeroCarousel({ slides }) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((c) => (c + 1) % heroSlides.length), 5000);
+    const timer = setInterval(() => setCurrent((c) => (c + 1) % heroSlides.length), 6000);
     return () => clearInterval(timer);
   }, [heroSlides.length]);
 
   return (
-    <section id="home" className="relative overflow-hidden">
-      <div className="relative h-[520px] sm:h-[600px]">
+    <section id="home" className="relative overflow-hidden bg-obsidian-950">
+      <div className="relative h-[560px] sm:h-[640px]">
         {heroSlides.map((slide, i) => (
           <div
             key={i}
             className="fade-slide absolute inset-0"
             style={{
               background: slide.image
-                ? `linear-gradient(0deg, rgba(20,14,10,0.55), rgba(20,14,10,0.35)), url('${slide.image}') center/cover no-repeat`
+                ? `linear-gradient(0deg, rgba(9,13,22,0.85), rgba(15,23,42,0.5)), url('${slide.image}') center/cover no-repeat`
                 : slideBackground(i),
               opacity: i === current ? 1 : 0,
             }}
           >
             <div className="max-w-7xl mx-auto h-full px-5 md:px-8 flex items-center">
-              <div className="max-w-xl text-cream">
-                <span className="inline-block text-xs uppercase tracking-widest bg-cream/15 px-3 py-1 rounded-full mb-4">
-                  {slide.tag}
+              <div className="max-w-2xl text-white">
+                <span className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-extrabold bg-champagne/20 border border-champagne/40 text-champagne px-4 py-1.5 rounded-full mb-6 backdrop-blur-md shadow-glow">
+                  <span>✨</span> {slide.tag || "Koleksi Optik 2026"}
                 </span>
-                <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">{slide.title}</h1>
-                <p className="text-cream/85 mb-8">{slide.desc}</p>
-                <div className="flex flex-wrap gap-3">
+
+                <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.1] tracking-tight mb-5 text-white drop-shadow-md">
+                  {slide.title}
+                </h1>
+
+                <p className="text-slate-300 text-sm sm:text-lg mb-8 leading-relaxed font-normal max-w-xl">
+                  {slide.desc}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4">
                   {slide.ctaPrimaryLabel && (
                     <Link
-                      href={slide.ctaPrimaryHref || "/shop"}
+                      href={slide.ctaPrimaryHref || "/store"}
                       target={isExternalHref(slide.ctaPrimaryHref) ? "_blank" : undefined}
                       rel={isExternalHref(slide.ctaPrimaryHref) ? "noopener noreferrer" : undefined}
-                      className="px-6 py-3 rounded-full bg-cream text-cinnamon-700 font-semibold hover:bg-cream/90 transition"
+                      className="px-8 py-4 rounded-2xl bg-gradient-to-r from-champagne-gold to-champagne hover:from-champagne hover:to-champagne-600 text-obsidian font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl shadow-champagne/20 transform hover:-translate-y-0.5"
                     >
                       {slide.ctaPrimaryLabel}
                     </Link>
@@ -56,7 +61,7 @@ export default function HeroCarousel({ slides }) {
                       href={slide.ctaSecondaryHref || "#layanan"}
                       target={isExternalHref(slide.ctaSecondaryHref) ? "_blank" : undefined}
                       rel={isExternalHref(slide.ctaSecondaryHref) ? "noopener noreferrer" : undefined}
-                      className="px-6 py-3 rounded-full border border-cream/40 text-cream font-semibold hover:bg-cream/10 transition"
+                      className="px-8 py-4 rounded-2xl glass-panel-dark text-white hover:bg-white/10 font-bold text-xs uppercase tracking-wider transition-all border border-white/20"
                     >
                       {slide.ctaSecondaryLabel}
                     </Link>
@@ -68,13 +73,16 @@ export default function HeroCarousel({ slides }) {
         ))}
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+      {/* Slide Indicators */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 bg-obsidian-950/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
         {heroSlides.map((_, i) => (
           <button
             key={i}
             aria-label={`Slide ${i + 1}`}
             onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 rounded-full transition ${i === current ? "bg-cream" : "bg-cream/50"}`}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === current ? "w-8 bg-champagne shadow-glow" : "w-2 bg-white/40 hover:bg-white/70"
+            }`}
           />
         ))}
       </div>
@@ -82,13 +90,12 @@ export default function HeroCarousel({ slides }) {
   );
 }
 
-// Rotating set of on-brand gradients applied by slide position (kept in code, not CMS,
-// since a color-picker for gradients isn't worth the admin complexity).
 const gradients = [
-  "linear-gradient(120deg,#4A2E1E 0%,#8B5E3C 60%,#A8794F 100%)",
-  "linear-gradient(120deg,#2A2622 0%,#7A756D 60%,#8B5E3C 100%)",
-  "linear-gradient(120deg,#6E8B63 0%,#4A2E1E 70%,#2A2622 100%)",
+  "linear-gradient(135deg, #090D16 0%, #0F172A 60%, #1E293B 100%)",
+  "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #090D16 100%)",
+  "linear-gradient(135deg, #1E293B 0%, #090D16 70%, #0F172A 100%)",
 ];
+
 function slideBackground(index) {
   return gradients[index % gradients.length];
 }

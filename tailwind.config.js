@@ -7,54 +7,85 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Cinnamon brand ramp — DEFAULT (500) matches the reference design's primary brown
-        cinnamon: {
-          DEFAULT: "#8B5E3C",
-          50: "#F7EFE7",
-          100: "#EFDFCE",
-          200: "#DCC0A0",
-          300: "#C79E71",
-          400: "#A8794F", // "light" accent
-          500: "#8B5E3C", // primary
-          600: "#6E4A2F",
-          700: "#4A2E1E", // "dark"
-          800: "#3A2416",
-          900: "#241608",
-          light: "#A8794F",
-          dark: "#4A2E1E",
+        // Modern 2026 Obsidian & Champagne Luxury Ramp
+        obsidian: {
+          DEFAULT: "#0F172A",
+          950: "#090D16",
+          900: "#0F172A",
+          800: "#1E293B",
+          700: "#334155",
         },
-        // Bark kept for backward compatibility with existing markup, remapped to the
-        // charcoal/warm-gray text scale used across the reference design.
+        champagne: {
+          DEFAULT: "#C5A059",
+          50: "#FAF6EF",
+          100: "#F3EBD9",
+          200: "#E6D6B2",
+          300: "#D8C08A",
+          400: "#CFAA63",
+          500: "#C5A059",
+          600: "#A3803D",
+          700: "#7E602B",
+          gold: "#D4AF37",
+        },
+        pearl: {
+          DEFAULT: "#F8FAFC",
+          card: "#FFFFFF",
+          muted: "#F1F5F9",
+        },
+        // Cinnamon brand ramp — remapped to rich champagne gold & bronze accents
+        cinnamon: {
+          DEFAULT: "#C5A059",
+          50: "#FAF6EF",
+          100: "#F3EBD9",
+          200: "#E6D6B2",
+          300: "#D8C08A",
+          400: "#CFAA63",
+          500: "#C5A059",
+          600: "#A3803D",
+          700: "#0F172A",
+          800: "#090D16",
+          900: "#05080E",
+          light: "#D8C08A",
+          dark: "#0F172A",
+        },
         bark: {
-          50: "#F2EEE9",
-          100: "#E4D8C8",
-          300: "#7A756D", // warm gray — muted text
-          500: "#4A2E1E",
-          700: "#2A2622", // charcoal — headings/body
-          900: "#1C1915",
+          50: "#F8FAFC",
+          100: "#E2E8F0",
+          300: "#64748B",
+          500: "#334155",
+          700: "#0F172A",
+          900: "#090D16",
         },
         cream: {
-          DEFAULT: "#F5EDE3",
-          card: "#FFFCF8",
+          DEFAULT: "#FAF9F6",
+          card: "#FFFFFF",
         },
-        sand: "#E4D8C8",
-        beige: "#E4D8C8",
-        gold: "#A8794F",
-        ink: "#2A2622",
-        charcoal: "#2A2622",
-        warmgray: "#7A756D",
-        sage: "#6E8B63",
+        sand: "#E2E8F0",
+        beige: "#F1F5F9",
+        gold: "#C5A059",
+        ink: "#0F172A",
+        charcoal: "#0F172A",
+        warmgray: "#64748B",
+        sage: "#10B981",
       },
       fontFamily: {
-        display: ["var(--font-jakarta)", "sans-serif"],
-        body: ["var(--font-jakarta)", "sans-serif"],
-        mono: ["var(--font-jakarta)", "sans-serif"],
-        sans: ["var(--font-jakarta)", "sans-serif"],
+        display: ["var(--font-jakarta)", "Plus Jakarta Sans", "Outfit", "sans-serif"],
+        body: ["var(--font-jakarta)", "Inter", "sans-serif"],
+        mono: ["monospace"],
+        sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "sans-serif"],
+      },
+      boxShadow: {
+        glass: "0 8px 32px 0 rgba(15, 23, 42, 0.08)",
+        "glass-hover": "0 12px 40px 0 rgba(197, 160, 89, 0.18)",
+        glow: "0 0 25px -5px rgba(197, 160, 89, 0.35)",
+        "card-modern": "0 10px 30px -10px rgba(15, 23, 42, 0.05)",
       },
       borderRadius: {
         curl: "0 999px 0 999px",
+        "4xl": "2rem",
       },
     },
   },
   plugins: [],
 };
+
