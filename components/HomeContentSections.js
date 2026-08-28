@@ -267,7 +267,7 @@ function SponsorSlider({ sponsors }) {
           {[...items, ...items, ...items].map((item, i) => (
             <div
               key={`${item.image || item.name}-${i}`}
-              className="w-48 h-24 rounded-2xl border border-slate-200 bg-white flex items-center justify-center p-5 shadow-lg"
+              className="w-56 h-32 rounded-2xl border border-slate-200 bg-white flex items-center justify-center p-3 shadow-lg"
             >
               {item.image ? (
                 <img src={item.image} alt={item.name || "Brand"} className="max-w-full max-h-full object-contain" />
