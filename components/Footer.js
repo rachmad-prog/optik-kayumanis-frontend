@@ -38,12 +38,15 @@ export default function Footer({ content }) {
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
         <div>
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-2xl bg-champagne text-obsidian font-extrabold flex items-center justify-center text-lg shadow-glow">
-              OK
+            <div className="w-10 h-10 rounded-2xl bg-champagne flex items-center justify-center text-lg shadow-glow overflow-hidden">
+              <img
+                src="https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png"
+                alt="Optik Kayumanis"
+                className="w-full h-full object-contain p-1"
+              />
             </div>
             <div>
               <p className="font-extrabold text-lg text-white tracking-tight">Optik Kayumanis</p>
-              <p className="text-[10px] uppercase font-bold tracking-widest text-champagne">Est. Modern 2026</p>
             </div>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed mb-6">

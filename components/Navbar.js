@@ -98,16 +98,17 @@ export default function Navbar({ content }) {
         <nav className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-20">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <div className="w-11 h-11 rounded-2xl bg-obsidian text-champagne font-extrabold text-xl flex items-center justify-center shadow-lg shadow-obsidian/20 group-hover:scale-105 transition-transform duration-300 border border-slate-800">
-              OK
+            <div className="w-11 h-11 rounded-2xl bg-obsidian flex items-center justify-center shadow-lg shadow-obsidian/20 group-hover:scale-105 transition-transform duration-300 border border-slate-800 overflow-hidden">
+              <img
+                src="https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png"
+                alt="Optik Kayumanis"
+                className="w-full h-full object-contain p-1.5"
+              />
             </div>
             <div className="leading-tight">
               <span className="font-extrabold text-xl tracking-tight text-obsidian flex items-center gap-1">
                 Optik Kayumanis
                 <span className="text-champagne font-light">.</span>
-              </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-champagne-600 block">
-                Eyewear & Eyecare 2026
               </span>
             </div>
           </Link>

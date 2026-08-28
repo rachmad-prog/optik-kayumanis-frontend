@@ -20,6 +20,11 @@ export const metadata = {
   title: "Optik Kayumanis — Kacamata & Lensa Kontak Premium",
   description:
     "Optik Kayumanis: kacamata optik, kacamata hitam, dan lensa kontak premium dengan layanan periksa mata profesional.",
+  icons: {
+    icon: "https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png",
+    shortcut: "https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png",
+    apple: "https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png",
+  },
 };
 
 async function getSiteContent() {
