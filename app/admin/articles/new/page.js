@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../context/AuthContext";
 import { api } from "../../../../lib/api";
+import RichTextEditor from "../../../../components/RichTextEditor";
 
 function slugify(str) {
   return str
@@ -34,7 +35,6 @@ export default function NewArticlePage() {
   function setField(key, val) {
     setForm((f) => {
       const next = { ...f, [key]: val };
-      // Auto-generate slug dari judul
       if (key === "title") {
         next.slug = slugify(val);
       }
@@ -81,13 +81,13 @@ export default function NewArticlePage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => router.back()}
           className="text-bark-400 hover:text-bark-700 text-sm"
         >
-          ← Kembali
+          &larr; Kembali
         </button>
         <h1 className="font-display text-2xl font-semibold text-bark-700">Tulis Artikel Baru</h1>
       </div>
@@ -143,23 +143,19 @@ export default function NewArticlePage() {
           />
         </div>
 
-        {/* Konten */}
+        {/* Konten dengan Visual Rich Text Editor */}
         <div>
           <label className="block text-sm font-semibold text-bark-700 mb-1">Konten Artikel *</label>
-          <textarea
-            className="w-full border border-sand rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-cinnamon-400 font-mono"
-            rows={12}
+          <RichTextEditor
             value={form.content}
-            onChange={(e) => setField("content", e.target.value)}
-            placeholder="Tulis isi artikel di sini. Mendukung HTML dasar seperti <h2>, <p>, <strong>, <ul>, <li>."
-            required
+            onChange={(html) => setField("content", html)}
+            token={token}
           />
-          <p className="text-xs text-bark-300 mt-1">Mendukung HTML dasar: &lt;h2&gt;, &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;img&gt;.</p>
         </div>
 
         {/* Thumbnail */}
         <div>
-          <label className="block text-sm font-semibold text-bark-700 mb-1">Gambar Thumbnail</label>
+          <label className="block text-sm font-semibold text-bark-700 mb-1">Gambar Cover / Thumbnail Utama</label>
           {form.thumbnail && (
             <div className="mb-2 relative w-40 h-28 rounded-xl overflow-hidden border border-sand">
               <img src={form.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -176,7 +172,7 @@ export default function NewArticlePage() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            {uploading ? "Mengupload..." : "Upload Gambar"}
+            {uploading ? "Mengupload..." : "Upload Gambar Cover"}
             <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploading} />
           </label>
           <p className="text-xs text-bark-300 mt-1">Atau isi URL gambar langsung:</p>

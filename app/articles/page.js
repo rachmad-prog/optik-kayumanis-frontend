@@ -1,12 +1,25 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { api } from "../../lib/api";
 
 export const revalidate = 60;
 
+const SITE_URL = process.env.NEXT_PUBLIC_CLIENT_URL || "https://optikkayumanis.com";
+
 export const metadata = {
-  title: "Artikel - Optik Kayumanis",
-  description: "Tips perawatan mata, panduan kacamata, dan info terbaru dari Optik Kayumanis.",
+  title: "Artikel & Edukasi Kesehatan Mata | Optik Kayumanis",
+  description: "Tips perawatan mata, panduan memilih kacamata & lensa, serta informasi promo terbaru dari Optik Kayumanis.",
+  alternates: {
+    canonical: `${SITE_URL}/articles`,
+  },
+  openGraph: {
+    title: "Artikel & Edukasi Kesehatan Mata | Optik Kayumanis",
+    description: "Tips perawatan mata, panduan memilih kacamata & lensa, serta informasi promo terbaru dari Optik Kayumanis.",
+    url: `${SITE_URL}/articles`,
+    siteName: "Optik Kayumanis",
+    type: "website",
+  },
 };
+
 
 function formatDate(iso) {
   if (!iso) return "";

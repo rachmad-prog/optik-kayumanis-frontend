@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../../../context/AuthContext";
 import { api } from "../../../../../lib/api";
+import RichTextEditor from "../../../../../components/RichTextEditor";
 
 function slugify(str) {
   return str
@@ -92,7 +93,7 @@ export default function EditArticlePage() {
   if (error && !form) return <p className="text-red-500 text-sm">{error}</p>;
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => router.back()} className="text-bark-400 hover:text-bark-700 text-sm">
           &larr; Kembali
@@ -139,29 +140,26 @@ export default function EditArticlePage() {
 
         <div>
           <label className="block text-sm font-semibold text-bark-700 mb-1">Konten Artikel *</label>
-          <textarea
-            className="w-full border border-sand rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-cinnamon-400 font-mono"
-            rows={12}
+          <RichTextEditor
             value={form.content}
-            onChange={(e) => setField("content", e.target.value)}
-            required
+            onChange={(html) => setField("content", html)}
+            token={token}
           />
-          <p className="text-xs text-bark-300 mt-1">Mendukung HTML dasar: h2, p, strong, em, ul, li, a, img.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-bark-700 mb-1">Gambar Thumbnail</label>
+          <label className="block text-sm font-semibold text-bark-700 mb-1">Gambar Cover / Thumbnail Utama</label>
           {form.thumbnail && (
             <div className="mb-2 relative w-40 h-28 rounded-xl overflow-hidden border border-sand">
               <img src={form.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
               <button type="button" onClick={() => setField("thumbnail", "")}
                 className="absolute top-1 right-1 bg-white/80 hover:bg-white text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                x
+                ×
               </button>
             </div>
           )}
           <label className="inline-flex items-center gap-2 cursor-pointer bg-sand hover:bg-sand/80 text-bark-600 text-sm px-4 py-2 rounded-xl">
-            {uploading ? "Mengupload..." : "Upload Gambar"}
+            {uploading ? "Mengupload..." : "Upload Gambar Cover"}
             <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploading} />
           </label>
           <p className="text-xs text-bark-300 mt-1">Atau isi URL gambar langsung:</p>
