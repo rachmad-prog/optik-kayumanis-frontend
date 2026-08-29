@@ -55,6 +55,31 @@ function ImageLightbox({ image, onClose }) {
   );
 }
 
+function InvoiceStatusBadge({ order }) {
+  if (order.invoiceEmailSent) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded-full">
+        ✅ Invoice terkirim
+      </span>
+    );
+  }
+  if (order.invoiceEmailError) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2 py-1 rounded-full max-w-[220px] truncate"
+        title={order.invoiceEmailError}
+      >
+        ⚠️ Gagal kirim: {order.invoiceEmailError}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-bark-300 bg-sand/40 px-2 py-1 rounded-full">
+      ⏳ Belum terkirim
+    </span>
+  );
+}
+
 export default function AdminOrdersPage() {
   return (
     <PrinterProvider>
@@ -68,6 +93,7 @@ function AdminOrdersPageInner() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
+  const [resendingId, setResendingId] = useState(null);
 
   function loadOrders() {
     setLoading(true);
@@ -84,6 +110,19 @@ function AdminOrdersPageInner() {
       loadOrders();
     } catch (err) {
       alert(err.message);
+    }
+  }
+
+  async function handleResendInvoice(id) {
+    setResendingId(id);
+    try {
+      const res = await api.post(`/orders/admin/${id}/resend-invoice`, {}, token);
+      alert(res.message || "Invoice berhasil dikirim ulang.");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setResendingId(null);
+      loadOrders();
     }
   }
 
@@ -118,6 +157,19 @@ function AdminOrdersPageInner() {
                     ))}
                   </select>
                 </div>
+              </div>
+              <div className="flex items-center gap-2 mb-3">
+                <InvoiceStatusBadge order={order} />
+                {!order.invoiceEmailSent && (
+                  <button
+                    type="button"
+                    onClick={() => handleResendInvoice(order.id)}
+                    disabled={resendingId === order.id}
+                    className="text-xs font-medium text-cinnamon-600 hover:text-cinnamon-700 underline disabled:opacity-50"
+                  >
+                    {resendingId === order.id ? "Mengirim..." : "Kirim Ulang Invoice"}
+                  </button>
+                )}
               </div>
               <ul className="text-sm text-bark-500 mb-2 space-y-2">
                 {order.items.map((item) => {
