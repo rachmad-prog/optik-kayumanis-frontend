@@ -1,4 +1,4 @@
-﻿import { api } from "../lib/api";
+import { api } from "../lib/api";
 import HeroCarousel from "../components/HeroCarousel";
 import HomeContentSections from "../components/HomeContentSections";
 import { DEFAULT_CONTENT } from "../lib/defaultContent";
@@ -129,20 +129,20 @@ export default async function HomePage() {
       </section>
 
       {/* Layanan periksa mata */}
-      <section id="layanan-periksa-mata" className="bg-cinnamon-700 text-cream">
+      <section id="layanan-periksa-mata" className="bg-amber-50/70 border-y border-amber-200/50 text-charcoal">
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <p className="text-cream/60 font-semibold uppercase tracking-widest text-xs mb-2">
+            <p className="text-cinnamon font-semibold uppercase tracking-widest text-xs mb-2">
               {layanan.eyebrow}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-5">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-5 text-charcoal">
               {layanan.title}
             </h2>
-            <p className="text-cream/80 mb-8">{layanan.description}</p>
-            <ul className="space-y-3 mb-8 text-sm">
+            <p className="text-slate-600 mb-8">{layanan.description}</p>
+            <ul className="space-y-3 mb-8 text-sm text-slate-700">
               {layanan.bullets.map((b, i) => (
                 <li key={i} className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-cream" /> {b}
+                  <span className="w-2.5 h-2.5 rounded-full bg-cinnamon" /> {b}
                 </li>
               ))}
             </ul>
@@ -154,7 +154,7 @@ export default async function HomePage() {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-6 py-3 rounded-full bg-cream text-cinnamon-700 font-semibold hover:bg-cream/90 transition">
+              className="inline-block px-6 py-3.5 rounded-full bg-cinnamon text-white font-semibold hover:bg-cinnamon-600 transition shadow-lg shadow-cinnamon/20">
               {layanan.ctaLabel}
             </a>
           </div>
@@ -162,7 +162,7 @@ export default async function HomePage() {
             isDirectVideoUrl(layanan.media) ? (
               <video
                 src={layanan.media}
-                className="aspect-[4/3] rounded-2xl w-full object-cover"
+                className="aspect-[4/3] rounded-2xl w-full object-cover shadow-xl border border-amber-200/60"
                 autoPlay
                 loop
                 muted
@@ -171,7 +171,7 @@ export default async function HomePage() {
             ) : isEmbeddableLink(layanan.media) ? (
               <iframe
                 src={toEmbedUrl(layanan.media)}
-                className="aspect-[4/3] rounded-2xl w-full"
+                className="aspect-[4/3] rounded-2xl w-full shadow-xl border border-amber-200/60"
                 allow="autoplay; encrypted-media"
                 allowFullScreen
               />
@@ -179,13 +179,13 @@ export default async function HomePage() {
               <img
                 src={layanan.media}
                 alt={layanan.title}
-                className="aspect-[4/3] rounded-2xl w-full object-cover"
+                className="aspect-[4/3] rounded-2xl w-full object-cover shadow-xl border border-amber-200/60"
               />
             )
           ) : (
             <div
-              className="aspect-[4/3] rounded-2xl"
-              style={{ background: "linear-gradient(160deg,#A8794F,#2A2622)" }}
+              className="aspect-[4/3] rounded-2xl shadow-xl border border-amber-200/60"
+              style={{ background: "linear-gradient(160deg,#FDBA74,#FED7AA)" }}
             />
           )}
         </div>

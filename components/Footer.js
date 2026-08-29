@@ -31,14 +31,14 @@ export default function Footer({ content }) {
   const mapSrc = toMapEmbedSrc(footer.mapEmbed);
 
   return (
-    <footer className="bg-obsidian-950 text-slate-300 mt-20 border-t border-slate-800 relative overflow-hidden">
+    <footer className="bg-amber-50/70 text-slate-700 mt-20 border-t border-amber-200/60 relative overflow-hidden">
       {/* Decorative ambient light */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-champagne/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cinnamon/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
         <div>
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-2xl bg-champagne flex items-center justify-center text-lg shadow-glow overflow-hidden">
+            <div className="w-10 h-10 rounded-2xl bg-cinnamon flex items-center justify-center text-lg shadow-glow overflow-hidden">
               <img
                 src="https://res.cloudinary.com/dpywh4kpe/image/upload/v1787889306/logo_ory2zt.png"
                 alt="Optik Kayumanis"
@@ -46,10 +46,10 @@ export default function Footer({ content }) {
               />
             </div>
             <div>
-              <p className="font-extrabold text-lg text-white tracking-tight">Optik Kayumanis</p>
+              <p className="font-extrabold text-lg text-charcoal tracking-tight">Optik Kayumanis</p>
             </div>
           </div>
-          <p className="text-xs text-slate-400 leading-relaxed mb-6">
+          <p className="text-xs text-slate-600 leading-relaxed mb-6">
             {footer.description || "Penyedia solusi penglihatan dan eyewear premium dengan standar pemeriksaan optik presisi tinggi."}
           </p>
           <div className="flex gap-3">
@@ -60,7 +60,7 @@ export default function Footer({ content }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={key}
-                className="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-300 flex items-center justify-center hover:bg-champagne hover:text-obsidian transition duration-300 border border-slate-700"
+                className="w-9 h-9 rounded-xl bg-white text-slate-700 flex items-center justify-center hover:bg-cinnamon hover:text-white transition duration-300 border border-slate-200 shadow-sm"
               >
                 {socialIcons[key]}
               </a>
@@ -69,24 +69,24 @@ export default function Footer({ content }) {
         </div>
 
         <div>
-          <p className="font-extrabold text-sm text-white uppercase tracking-wider mb-5">Navigasi Katalog</p>
+          <p className="font-extrabold text-sm text-charcoal uppercase tracking-wider mb-5">Navigasi Katalog</p>
           <ul className="space-y-3 text-xs">
-            <li><Link href="/" className="hover:text-champagne transition">{t("home")}</Link></li>
-            <li><Link href="/store" className="hover:text-champagne transition">✨ {t("store")} 2026</Link></li>
-            <li><Link href="/store?category=kacamata-optik" className="hover:text-champagne transition">{t("opticalGlasses")}</Link></li>
-            <li><Link href="/store?category=lensa-kontak" className="hover:text-champagne transition">{t("contactLenses")}</Link></li>
+            <li><Link href="/" className="hover:text-cinnamon transition">{t("home")}</Link></li>
+            <li><Link href="/store" className="hover:text-cinnamon transition">✨ {t("store")} 2026</Link></li>
+            <li><Link href="/store?category=kacamata-optik" className="hover:text-cinnamon transition">{t("opticalGlasses")}</Link></li>
+            <li><Link href="/store?category=lensa-kontak" className="hover:text-cinnamon transition">{t("contactLenses")}</Link></li>
           </ul>
         </div>
 
         <div>
-          <p className="font-extrabold text-sm text-white uppercase tracking-wider mb-5">{t("account")}</p>
+          <p className="font-extrabold text-sm text-charcoal uppercase tracking-wider mb-5">{t("account")}</p>
           <ul className="space-y-3 text-xs">
-            <li><Link href="/account" className="hover:text-champagne transition">{t("myOrders")}</Link></li>
-            <li><Link href="/login" className="hover:text-champagne transition">{t("login")}</Link></li>
-            <li><Link href="/register" className="hover:text-champagne transition">{t("registerAccount")}</Link></li>
+            <li><Link href="/account" className="hover:text-cinnamon transition">{t("myOrders")}</Link></li>
+            <li><Link href="/login" className="hover:text-cinnamon transition">{t("login")}</Link></li>
+            <li><Link href="/register" className="hover:text-cinnamon transition">{t("registerAccount")}</Link></li>
           </ul>
-          <p className="font-extrabold text-xs text-champagne uppercase tracking-wider mt-6 mb-3">{t("operatingHours")}</p>
-          <ul className="space-y-1.5 text-xs text-slate-400">
+          <p className="font-extrabold text-xs text-cinnamon uppercase tracking-wider mt-6 mb-3">{t("operatingHours")}</p>
+          <ul className="space-y-1.5 text-xs text-slate-600">
             {(footer.hours || []).map((h, i) => (
               <li key={i}>{h}</li>
             ))}
@@ -94,26 +94,26 @@ export default function Footer({ content }) {
         </div>
 
         <div>
-          <p className="font-extrabold text-sm text-white uppercase tracking-wider mb-5">{t("location")}</p>
-          <p className="text-xs text-slate-400 mb-2 leading-relaxed">{footer.address}</p>
-          <p className="text-xs text-slate-400 mb-1">WhatsApp: <span className="text-white font-medium">{footer.whatsappDisplay}</span></p>
-          <p className="text-xs text-slate-400 mb-4">Email: <span className="text-white font-medium">{footer.email}</span></p>
+          <p className="font-extrabold text-sm text-charcoal uppercase tracking-wider mb-5">{t("location")}</p>
+          <p className="text-xs text-slate-600 mb-2 leading-relaxed">{footer.address}</p>
+          <p className="text-xs text-slate-600 mb-1">WhatsApp: <span className="text-charcoal font-medium">{footer.whatsappDisplay}</span></p>
+          <p className="text-xs text-slate-600 mb-4">Email: <span className="text-charcoal font-medium">{footer.email}</span></p>
           {mapSrc ? (
             <iframe
               src={mapSrc}
-              className="aspect-video rounded-2xl w-full border border-slate-800"
+              className="aspect-video rounded-2xl w-full border border-slate-200 shadow-sm"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
           ) : (
-            <div className="aspect-video rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xs text-slate-500">
+            <div className="aspect-video rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-400">
               {t("mapLocation")}
             </div>
           )}
         </div>
       </div>
 
-      <div className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+      <div className="border-t border-amber-200/50 py-6 text-center text-xs text-slate-500">
         © {new Date().getFullYear()} {footer.copyrightText || `Optik Kayumanis. ${t("allRightsReserved")}`}
       </div>
     </footer>

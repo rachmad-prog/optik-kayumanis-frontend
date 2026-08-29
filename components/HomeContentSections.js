@@ -252,27 +252,27 @@ function SponsorSlider({ sponsors }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-16 bg-slate-900 border-y border-slate-800 text-white overflow-hidden">
+    <section className="py-16 bg-amber-50/60 border-y border-amber-200/50 text-charcoal overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 md:px-8 mb-8 text-center">
-        <span className="text-xs uppercase tracking-widest font-extrabold text-champagne mb-2 inline-block">
+        <span className="text-xs uppercase tracking-widest font-extrabold text-cinnamon mb-2 inline-block">
           Official Lens & Frame Partners
         </span>
-        <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-charcoal">
           {sponsors?.title || "Brand Optik Terpercaya"}
         </h2>
-        {sponsors?.subtitle && <p className="text-slate-400 text-sm mt-2">{sponsors.subtitle}</p>}
+        {sponsors?.subtitle && <p className="text-slate-600 text-sm mt-2">{sponsors.subtitle}</p>}
       </div>
       <div className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden">
         <div className="sponsor-track flex gap-6 w-max mx-auto">
           {[...items, ...items, ...items].map((item, i) => (
             <div
               key={`${item.image || item.name}-${i}`}
-              className="w-56 h-32 rounded-2xl border border-slate-200 bg-white flex items-center justify-center p-3 shadow-lg"
+              className="w-56 h-32 rounded-2xl border border-slate-200 bg-white flex items-center justify-center p-3 shadow-sm hover:shadow-md transition"
             >
               {item.image ? (
                 <img src={item.image} alt={item.name || "Brand"} className="max-w-full max-h-full object-contain" />
               ) : (
-                <span className="text-sm font-extrabold text-champagne tracking-wider">{item.name || "Brand"}</span>
+                <span className="text-sm font-extrabold text-cinnamon tracking-wider">{item.name || "Brand"}</span>
               )}
             </div>
           ))}
@@ -290,10 +290,10 @@ function ContactSection({ contact, footer }) {
   return (
     <section id="kontak" className="max-w-7xl mx-auto px-5 md:px-8 py-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
-        <span className="text-xs font-extrabold uppercase tracking-widest text-champagne-600 bg-champagne-50 px-3.5 py-1 rounded-full inline-block mb-3">
+        <span className="text-xs font-extrabold uppercase tracking-widest text-cinnamon bg-cinnamon-50 px-3.5 py-1 rounded-full inline-block mb-3">
           Customer Service & Booking
         </span>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-obsidian tracking-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-charcoal tracking-tight">
           {contact?.title || "Hubungi Tim Optik Kayumanis"}
         </h2>
         {contact?.subtitle && <p className="text-slate-500 text-sm sm:text-base mt-3">{contact.subtitle}</p>}
@@ -301,7 +301,7 @@ function ContactSection({ contact, footer }) {
 
       <div className="grid lg:grid-cols-2 gap-10 items-stretch">
         <form
-          className="bg-white border border-slate-100 shadow-2xl rounded-3xl p-6 md:p-8"
+          className="bg-white border border-slate-100 shadow-xl rounded-3xl p-6 md:p-8"
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
@@ -319,26 +319,26 @@ function ContactSection({ contact, footer }) {
           }}
         >
           <label className="block mb-5">
-            <span className="block text-xs font-extrabold uppercase tracking-wider text-obsidian mb-2">Nama Lengkap</span>
+            <span className="block text-xs font-extrabold uppercase tracking-wider text-charcoal mb-2">Nama Lengkap</span>
             <input
               required
               name="name"
               placeholder="Masukkan nama Anda"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-obsidian focus:outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/20 transition"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-charcoal focus:outline-none focus:border-cinnamon focus:ring-2 focus:ring-cinnamon/20 transition"
             />
           </label>
           <label className="block mb-5">
-            <span className="block text-xs font-extrabold uppercase tracking-wider text-obsidian mb-2">Alamat Email</span>
+            <span className="block text-xs font-extrabold uppercase tracking-wider text-charcoal mb-2">Alamat Email</span>
             <input
               required
               type="email"
               name="email"
               placeholder="nama@email.com"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-obsidian focus:outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/20 transition"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-charcoal focus:outline-none focus:border-cinnamon focus:ring-2 focus:ring-cinnamon/20 transition"
             />
           </label>
           <label className="block mb-5">
-            <span className="block text-xs font-extrabold uppercase tracking-wider text-obsidian mb-2">Nomor WhatsApp</span>
+            <span className="block text-xs font-extrabold uppercase tracking-wider text-charcoal mb-2">Nomor WhatsApp</span>
             <input
               required
               inputMode="numeric"
@@ -346,37 +346,37 @@ function ContactSection({ contact, footer }) {
               value={phone}
               placeholder="081234567890"
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-obsidian focus:outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/20 transition"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-charcoal focus:outline-none focus:border-cinnamon focus:ring-2 focus:ring-cinnamon/20 transition"
             />
           </label>
           <label className="block mb-6">
-            <span className="block text-xs font-extrabold uppercase tracking-wider text-obsidian mb-2">Pesan / Konsultasi Lensa</span>
+            <span className="block text-xs font-extrabold uppercase tracking-wider text-charcoal mb-2">Pesan / Konsultasi Lensa</span>
             <textarea
               required
               rows={4}
               name="message"
               placeholder="Tuliskan pesan, ukuran minus, atau pertanyaan Anda di sini..."
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-obsidian focus:outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/20 transition"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 bg-slate-50 text-xs md:text-sm text-charcoal focus:outline-none focus:border-cinnamon focus:ring-2 focus:ring-cinnamon/20 transition"
             />
           </label>
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl bg-obsidian text-white font-extrabold text-xs uppercase tracking-wider hover:bg-champagne hover:text-obsidian transition-all shadow-xl shadow-obsidian/20"
+            className="w-full py-4 rounded-2xl bg-cinnamon text-white font-extrabold text-xs uppercase tracking-wider hover:bg-cinnamon-600 transition-all shadow-lg shadow-cinnamon/20"
           >
             💬 Kirim Pesan via WhatsApp
           </button>
         </form>
 
-        <div className="rounded-3xl overflow-hidden border border-slate-100 bg-slate-900 shadow-2xl min-h-[360px] relative">
+        <div className="rounded-3xl overflow-hidden border border-amber-200/60 bg-amber-50/50 shadow-xl min-h-[360px] relative">
           {image ? (
             <img src={image} alt={contact?.title || "Kontak Optik Kayumanis"} className="w-full h-full object-cover" />
           ) : (
             fallbackImage(contact?.title || "Kontak Optik Kayumanis")
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian-950 via-transparent to-transparent p-8 flex flex-col justify-end">
-            <p className="text-xs uppercase font-extrabold tracking-widest text-champagne mb-1">Standar Pelayanan 2026</p>
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian-950/90 via-obsidian-950/40 to-transparent p-8 flex flex-col justify-end">
+            <p className="text-xs uppercase font-extrabold tracking-widest text-cinnamon-300 mb-1">Standar Pelayanan 2026</p>
             <p className="text-xl font-extrabold text-white">Layanan Konsultasi Cepat & Ramah</p>
-            <p className="text-xs text-slate-300 mt-1">Tim optometris kami siap membantu menentukan jenis lensa dan ukuran frame paling tepat untukmu.</p>
+            <p className="text-xs text-slate-200 mt-1">Tim optometris kami siap membantu menentukan jenis lensa dan ukuran frame paling tepat untukmu.</p>
           </div>
         </div>
       </div>
