@@ -3,9 +3,12 @@ import { api, formatRupiah } from "../../../lib/api";
 import AddToCartForm from "../../../components/AddToCartForm";
 import ProductGallery from "../../../components/ProductGallery";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getProduct(slug) {
   try {
-    const data = await api.get(`/products/${slug}`);
+    const data = await api.get(`/products/${slug}`, null, { cache: "no-store" });
     return data.product;
   } catch {
     return null;

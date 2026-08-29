@@ -1,6 +1,9 @@
 import { api } from "../../lib/api";
 import ShopCatalogContainer from "../../components/ShopCatalogContainer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getProducts(searchParams) {
   const params = new URLSearchParams();
   if (searchParams.category) params.set("category", searchParams.category);
@@ -8,7 +11,7 @@ async function getProducts(searchParams) {
   params.set("limit", "48");
 
   try {
-    const data = await api.get(`/products?${params.toString()}`);
+    const data = await api.get(`/products?${params.toString()}`, null, { cache: "no-store" });
     return data.items || [];
   } catch {
     return [];
@@ -17,7 +20,7 @@ async function getProducts(searchParams) {
 
 async function getCategories() {
   try {
-    const data = await api.get("/categories");
+    const data = await api.get("/categories", null, { cache: "no-store" });
     return data.items || [];
   } catch {
     return [];
