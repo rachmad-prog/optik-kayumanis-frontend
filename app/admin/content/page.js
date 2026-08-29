@@ -1312,6 +1312,20 @@ export default function AdminContentPage() {
               onChange={(v) => update(["layananSlider", "subtitle"], v)}
               textarea
             />
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItemAtStart(["layananSlider", "items"], {
+                    title: "Layanan baru",
+                    desc: "Deskripsi layanan baru",
+                    image: "",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Slide Layanan
+              </button>
+            </div>
             {content.layananSlider.items.map((item, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-4">
                 <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
