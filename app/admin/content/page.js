@@ -35,7 +35,8 @@ function Field({ label, value, onChange, textarea, hint }) {
   );
 }
 
-function Section({ title, children, onSave, saving, status }) {
+function Section({ title, children, onSave, saving, uploading, status }) {
+  const blocked = saving || uploading;
   return (
     <div className="bg-white border border-sand rounded-2xl p-6 mb-6">
       <h2 className="font-display text-lg text-bark-700 mb-4">{title}</h2>
@@ -48,10 +49,15 @@ function Section({ title, children, onSave, saving, status }) {
               {status.message}
             </p>
           )}
+          {uploading && !saving && (
+            <p className="text-xs text-bark-300">
+              Menunggu upload gambar selesai...
+            </p>
+          )}
           <button
             type="button"
             onClick={onSave}
-            disabled={saving}
+            disabled={blocked}
             className="shrink-0 bg-cinnamon-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-cinnamon-600 disabled:opacity-50">
             {saving ? "Menyimpan..." : "Simpan"}
           </button>
@@ -78,6 +84,94 @@ function AddRemove({ onAdd, onRemove, addLabel }) {
           Hapus
         </button>
       )}
+    </div>
+  );
+}
+
+function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
+  const [localPreview, setLocalPreview] = useState(null);
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    if (!uploading && localPreview) {
+      URL.revokeObjectURL(localPreview);
+      setLocalPreview(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploading]);
+
+  const displayImage = localPreview || image;
+
+  useEffect(() => {
+    setImgError(false);
+  }, [displayImage]);
+
+  return (
+    <div className="mb-4">
+      <label className="block text-sm font-semibold text-bark-700 mb-1">
+        {label}
+      </label>
+      <div className="flex items-center gap-4">
+        {displayImage ? (
+          <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0 bg-stone-100 flex items-center justify-center">
+            {imgError ? (
+              <div className="text-[10px] text-red-500 text-center p-1 leading-tight">
+                Gagal memuat gambar
+              </div>
+            ) : (
+              <img
+                src={displayImage}
+                alt=""
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (localPreview) {
+                  URL.revokeObjectURL(localPreview);
+                  setLocalPreview(null);
+                }
+                onRemove();
+              }}
+              className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
+              aria-label="Hapus gambar">
+              x
+            </button>
+          </div>
+        ) : (
+          <div className="w-32 aspect-video rounded-lg border border-dashed border-sand flex items-center justify-center text-xs text-bark-300 shrink-0">
+            Belum ada
+          </div>
+        )}
+        <label className="inline-flex items-center gap-2 border border-dashed border-sand rounded-xl px-4 py-2.5 text-sm text-bark-500 cursor-pointer hover:border-cinnamon-400 hover:text-cinnamon-600">
+          <span>
+            {uploading
+              ? "Mengunggah..."
+              : displayImage
+                ? "Ganti Gambar"
+                : "+ Upload Gambar"}
+          </span>
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setLocalPreview((prev) => {
+                  if (prev) URL.revokeObjectURL(prev);
+                  return URL.createObjectURL(file);
+                });
+                onUpload(file);
+              }
+              e.target.value = "";
+            }}
+            className="hidden"
+          />
+        </label>
+      </div>
     </div>
   );
 }
@@ -452,6 +546,12 @@ export default function AdminContentPage() {
     } finally {
       setSlideUploading((m) => ({ ...m, [uploadKey]: false }));
     }
+  }
+
+  // True if any of the given slideUploading keys is currently uploading.
+  // Used to disable Simpan while images are still being uploaded.
+  function anyUploading(keys) {
+    return keys.some((k) => Boolean(slideUploading[k]));
   }
 
   // Uploads an image/video for the Layanan section's right-side media slot.
