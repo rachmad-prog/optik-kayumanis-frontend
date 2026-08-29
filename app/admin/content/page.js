@@ -616,7 +616,7 @@ export default function AdminContentPage() {
                         }
                         className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 rounded-full text-xs leading-5 text-center"
                         aria-label="Hapus gambar">
-                        Ã—
+                        x
                       </button>
                     </div>
                   ) : (

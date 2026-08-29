@@ -177,12 +177,20 @@ export default function Navbar({ content }) {
                 </button>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full border border-obsidian text-obsidian hover:bg-obsidian hover:text-white transition-all shadow-sm"
-              >
-                {t("login")}
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/track-order"
+                  className="text-xs font-bold text-slate-500 hover:text-champagne-600"
+                >
+                  Lacak Pesanan
+                </Link>
+                <Link
+                  href="/login"
+                  className="text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full border border-obsidian text-obsidian hover:bg-obsidian hover:text-white transition-all shadow-sm"
+                >
+                  {t("login")}
+                </Link>
+              </div>
             )}
           </div>
 
@@ -271,15 +279,26 @@ export default function Navbar({ content }) {
                   </li>
                 </>
               ) : (
-                <li className="pt-2">
-                  <Link
-                    href="/login"
-                    className="block text-center py-3 rounded-xl border border-obsidian text-obsidian font-bold"
-                    onClick={() => setOpen(false)}
-                  >
-                    {t("login")}
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link
+                      href="/track-order"
+                      className="block py-2 text-slate-600"
+                      onClick={() => setOpen(false)}
+                    >
+                      Lacak Pesanan
+                    </Link>
+                  </li>
+                  <li className="pt-2">
+                    <Link
+                      href="/login"
+                      className="block text-center py-3 rounded-xl border border-obsidian text-obsidian font-bold"
+                      onClick={() => setOpen(false)}
+                    >
+                      {t("login")}
+                    </Link>
+                  </li>
+                </>
               )}
             </ul>
           </div>

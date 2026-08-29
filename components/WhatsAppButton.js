@@ -62,7 +62,7 @@ export default function WhatsAppButton() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {open && (
         <div className="w-[300px] max-w-[85vw] bg-white rounded-2xl shadow-xl border border-beige overflow-hidden">
-          <div className="bg-sage text-white px-4 py-3 flex items-center justify-between">
+          <div className="bg-cinnamon-500 text-white px-4 py-3 flex items-center justify-between">
             <p className="font-semibold text-sm">Butuh Bantuan?</p>
             <button onClick={close} aria-label="Tutup" className="hover:opacity-80">
               <CloseIcon className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function WhatsAppButton() {
                     <button
                       key={id}
                       onClick={() => setView(Number(id))}
-                      className="text-left text-sm px-3 py-2 rounded-xl border border-beige hover:border-sage hover:bg-sage/5 transition text-charcoal"
+                      className="text-left text-sm px-3 py-2 rounded-xl border border-beige hover:border-cinnamon-400 hover:bg-cinnamon-50 transition text-charcoal"
                     >
                       {r.label}
                     </button>
@@ -120,7 +120,7 @@ export default function WhatsAppButton() {
       <button
         onClick={toggle}
         aria-label="Chat WhatsApp"
-        className="w-14 h-14 rounded-full bg-sage flex items-center justify-center shadow-lg hover:scale-110 transition"
+        className="w-14 h-14 rounded-full bg-cinnamon-500 flex items-center justify-center shadow-lg hover:scale-110 transition"
       >
         {open ? <CloseIcon className="w-6 h-6 text-white" /> : <ChatIcon className="w-7 h-7 text-white" />}
       </button>

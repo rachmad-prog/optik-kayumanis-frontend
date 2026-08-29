@@ -16,6 +16,7 @@ export default function CheckoutPage() {
 
   const [form, setForm] = useState({
     recipientName: user?.name || "",
+    email: user?.email || "",
     phone: "",
     shippingAddress: "",
     city: "",
@@ -28,6 +29,17 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [completedOrder, setCompletedOrder] = useState(null);
   const [copiedBank, setCopiedBank] = useState(false);
+
+  useEffect(() => {
+    // Kalau customer sedang login, auto-isi nama & email dari akunnya.
+    if (user) {
+      setForm((f) => ({
+        ...f,
+        recipientName: f.recipientName || user.name || "",
+        email: f.email || user.email || "",
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     api
@@ -60,10 +72,6 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError("");
 
-    if (!user) {
-      router.push("/login?next=/checkout");
-      return;
-    }
     if (items.length === 0) {
       setError("Keranjang kamu kosong.");
       return;
@@ -176,12 +184,21 @@ export default function CheckoutPage() {
             >
               <span>💬 Konfirmasi / Kirim Bukti via WhatsApp</span>
             </a>
-            <button
-              onClick={() => router.push("/account")}
-              className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-obsidian rounded-2xl font-bold text-xs uppercase tracking-wider transition"
-            >
-              Lihat Status Pesanan
-            </button>
+            {user ? (
+              <button
+                onClick={() => router.push("/account")}
+                className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-obsidian rounded-2xl font-bold text-xs uppercase tracking-wider transition"
+              >
+                Lihat Status Pesanan
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/track-order")}
+                className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-obsidian rounded-2xl font-bold text-xs uppercase tracking-wider transition"
+              >
+                Lacak Status Pesanan
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -218,6 +235,24 @@ export default function CheckoutPage() {
                 placeholder="Masukkan nama penerima"
                 className="w-full border border-slate-200 rounded-2xl px-4 py-3 text-xs md:text-sm text-obsidian focus:border-champagne focus:outline-none bg-slate-50"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-extrabold uppercase tracking-wider text-obsidian mb-1.5">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                placeholder="nama@email.com"
+                className="w-full border border-slate-200 rounded-2xl px-4 py-3 text-xs md:text-sm text-obsidian focus:border-champagne focus:outline-none bg-slate-50"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                Dipakai untuk mengirim invoice & konfirmasi pesanan.
+              </p>
             </div>
 
             <div>

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,22 +11,18 @@ export default function AddToCartForm({ product }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [showLoginNotice, setShowLoginNotice] = useState(false);
   const outOfStock = product.stock <= 0;
 
-  function requireLogin() {
-    setShowLoginNotice(true);
-  }
-
+  // Tidak perlu login: siapa saja (termasuk pengunjung tanpa akun) boleh
+  // menambahkan produk ke keranjang dan checkout. Data lengkap (email, no.
+  // telp, dll) tetap diminta & diwajibkan nanti di halaman checkout.
   function handleAdd() {
-    if (!user) return requireLogin();
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
   function handleBuyNow() {
-    if (!user) return requireLogin();
     addItem(product, quantity);
     router.push("/cart");
   }
@@ -67,18 +62,6 @@ export default function AddToCartForm({ product }) {
           </button>
         </div>
       </div>
-
-      {showLoginNotice && !user && (
-        <div className="mb-4 rounded-xl border border-cinnamon-300 bg-cinnamon-50 px-4 py-3 text-sm text-bark-700">
-          Silakan{" "}
-          <Link
-            href="/login"
-            className="font-medium text-cinnamon-600 underline hover:text-cinnamon-700">
-            masuk
-          </Link>{" "}
-          terlebih dahulu untuk menambahkan produk ke keranjang.
-        </div>
-      )}
 
       <div className="flex gap-3">
         <button

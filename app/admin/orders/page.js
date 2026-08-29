@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
 import { api, formatRupiah } from "../../../lib/api";
 import PrintReceiptButton from "../../../components/PrintReceiptButton";
@@ -17,10 +18,47 @@ const STATUS_LABEL = {
   EXPIRED: "Kedaluwarsa",
 };
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=200";
+
+function ImageLightbox({ image, onClose }) {
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  if (!image) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6"
+      onClick={onClose}
+    >
+      <div className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          aria-label="Tutup"
+          className="absolute -top-10 right-0 text-white/90 hover:text-white text-2xl leading-none"
+        >
+          ✕
+        </button>
+        <div className="relative w-full aspect-square bg-white rounded-2xl overflow-hidden shadow-2xl">
+          <Image src={image.url} alt={image.name} fill className="object-contain" sizes="512px" />
+        </div>
+        <p className="text-center text-white/90 text-sm mt-3">{image.name}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminOrdersPage() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
 
   function loadOrders() {
     setLoading(true);
@@ -53,7 +91,11 @@ export default function AdminOrdersPage() {
               <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                 <div>
                   <p className="font-mono text-sm text-bark-700">{order.orderNumber}</p>
-                  <p className="text-xs text-bark-300">{order.user?.name} — {order.user?.email}</p>
+                  <p className="text-xs text-bark-300">
+                    {order.user
+                      ? `${order.user.name} — ${order.user.email}`
+                      : `Tanpa akun (guest) — ${order.guestEmail || "-"}`}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <PrintReceiptButton order={order} />
@@ -68,10 +110,23 @@ export default function AdminOrdersPage() {
                   </select>
                 </div>
               </div>
-              <ul className="text-sm text-bark-500 mb-2">
-                {order.items.map((item) => (
-                  <li key={item.id}>{item.name} × {item.quantity}</li>
-                ))}
+              <ul className="text-sm text-bark-500 mb-2 space-y-2">
+                {order.items.map((item) => {
+                  const imageUrl = item.product?.images?.[0]?.url || FALLBACK_IMAGE;
+                  return (
+                    <li key={item.id} className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewImage({ url: imageUrl, name: item.name })}
+                        className="relative w-12 h-12 rounded-lg overflow-hidden bg-sand/40 shrink-0 cursor-zoom-in ring-1 ring-transparent hover:ring-cinnamon-300 transition"
+                        title="Lihat gambar produk"
+                      >
+                        <Image src={imageUrl} alt={item.name} fill className="object-cover" sizes="48px" />
+                      </button>
+                      <span>{item.name} × {item.quantity}</span>
+                    </li>
+                  );
+                })}
               </ul>
               <p className="text-xs text-bark-300 mb-1">
                 Kirim ke: {order.recipientName}, {order.shippingAddress}, {order.city}, {order.province} {order.postalCode}
@@ -82,6 +137,8 @@ export default function AdminOrdersPage() {
           {orders.length === 0 && <p className="text-bark-300 text-sm">Belum ada pesanan.</p>}
         </div>
       )}
+      <ImageLightbox image={previewImage} onClose={() => setPreviewImage(null)} />
     </div>
   );
 }
+
