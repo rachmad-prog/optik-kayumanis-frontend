@@ -39,7 +39,18 @@ function Section({ title, children, onSave, saving, uploading, status }) {
   const blocked = saving || uploading;
   return (
     <div className="bg-white border border-sand rounded-2xl p-6 mb-6">
-      <h2 className="font-display text-lg text-bark-700 mb-4">{title}</h2>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h2 className="font-display text-lg text-bark-700">{title}</h2>
+        {onSave && (
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={blocked}
+            className="shrink-0 bg-cinnamon-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-cinnamon-600 disabled:opacity-50">
+            {saving ? "Menyimpan..." : "Simpan"}
+          </button>
+        )}
+      </div>
       {children}
       {onSave && (
         <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-sand">
