@@ -116,6 +116,7 @@ function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
   // parent finishes (uploading flips back to false) it will have already
   // swapped `image` to the final, verified R2 URL, so we drop the preview.
   const [localPreview, setLocalPreview] = useState(null);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     if (!uploading && localPreview) {
@@ -127,6 +128,10 @@ function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
 
   const displayImage = localPreview || image;
 
+  useEffect(() => {
+    setImgError(false);
+  }, [displayImage]);
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-semibold text-bark-700 mb-1">
@@ -134,12 +139,19 @@ function ImageUploadField({ label, image, uploading, onUpload, onRemove }) {
       </label>
       <div className="flex items-center gap-4">
         {displayImage ? (
-          <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0">
-            <img
-              src={displayImage}
-              alt=""
-              className="w-full h-full object-cover"
-            />
+          <div className="relative w-32 aspect-video rounded-lg overflow-hidden border border-sand shrink-0 bg-stone-100 flex items-center justify-center">
+            {imgError ? (
+              <div className="text-[10px] text-red-500 text-center p-1 leading-tight">
+                Gagal memuat gambar
+              </div>
+            ) : (
+              <img
+                src={displayImage}
+                alt=""
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            )}
             <button
               type="button"
               onClick={() => {
