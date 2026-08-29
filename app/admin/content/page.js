@@ -52,7 +52,7 @@ function Section({ title, children, onSave, saving, uploading, status }) {
         )}
       </div>
       {children}
-      {onSave && (
+      {onSave && (status || (uploading && !saving)) && (
         <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-sand">
           {status && (
             <p
@@ -65,13 +65,6 @@ function Section({ title, children, onSave, saving, uploading, status }) {
               Menunggu upload gambar selesai...
             </p>
           )}
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={blocked}
-            className="shrink-0 bg-cinnamon-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-cinnamon-600 disabled:opacity-50">
-            {saving ? "Menyimpan..." : "Simpan"}
-          </button>
         </div>
       )}
     </div>
