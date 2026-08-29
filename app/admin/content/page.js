@@ -675,7 +675,7 @@ export default function AdminContentPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-sand pb-4 sticky top-0 bg-cream/95 backdrop-blur z-10 pt-1">
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-sand pb-4 sticky top-0 bg-cream/95 backdrop-blur z-20 pt-1">
         {TABS.map((t) => (
           <button
             key={t.id}
