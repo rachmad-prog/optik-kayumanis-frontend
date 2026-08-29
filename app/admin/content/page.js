@@ -346,10 +346,27 @@ export default function AdminContentPage() {
   const [sliderUploading, setSliderUploading] = useState({});
   const [kontakImageUploading, setKontakImageUploading] = useState(false);
 
+  // Deep merge helper so new keys (like storeSlides) from DEFAULT_CONTENT
+  // are always present even when the server hasn't saved them yet.
+  function deepMerge(base, override) {
+    if (!override || typeof override !== "object" || Array.isArray(override)) return override ?? base;
+    const result = { ...base };
+    for (const key of Object.keys(override)) {
+      const bVal = base?.[key];
+      const oVal = override[key];
+      if (oVal !== null && typeof oVal === "object" && !Array.isArray(oVal)) {
+        result[key] = deepMerge(bVal, oVal);
+      } else {
+        result[key] = oVal;
+      }
+    }
+    return result;
+  }
+
   useEffect(() => {
     api
       .get("/content")
-      .then((data) => setContent({ ...DEFAULT_CONTENT, ...data.content }))
+      .then((data) => setContent(deepMerge(DEFAULT_CONTENT, data.content)))
       .catch(() => setContent(DEFAULT_CONTENT));
   }, []);
 
