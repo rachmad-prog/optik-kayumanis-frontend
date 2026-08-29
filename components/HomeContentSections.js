@@ -97,66 +97,132 @@ function SectionHeader({ section, eyebrow, children }) {
   );
 }
 
+// Full-screen overlay showing every gallery item as a grid of thumbnails.
+// Clicking a thumbnail hands the item up to the parent, which opens it in
+// the existing ImageModal (stacked on top, z-[70] > this overlay's z-[65]).
+function GalleryOverlay({ open, items, onClose, onSelect }) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[65] bg-obsidian/90 backdrop-blur-md p-4 sm:p-8 overflow-y-auto animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6 sticky top-0">
+          <h3 className="text-white font-extrabold text-xl sm:text-2xl">
+            Galeri Foto ({items.length})
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
+            aria-label="Tutup"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {items.map((item, i) => {
+            const image = getItemImage(item);
+            return (
+              <button
+                type="button"
+                key={`${item.title || "galeri"}-${i}`}
+                onClick={() => onSelect(item)}
+                className="group relative block w-full rounded-xl overflow-hidden border border-white/10 bg-white/5 aspect-square text-left"
+              >
+                {image ? (
+                  <img
+                    src={image}
+                    alt={item.title || ""}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  fallbackImage(item.title)
+                )}
+                {item.title && (
+                  <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-[11px] font-semibold line-clamp-1">
+                    {item.title}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Grid gallery for the "Layanan" section: shows a limited number of photos
+// up front, with a "Lihat Semua Foto" button that opens the full grid in
+// GalleryOverlay. Every thumbnail (limited grid or overlay) opens ImageModal
+// to zoom. Admin data/shape (section.items) is unchanged from before.
+const LAYANAN_GALLERY_LIMIT = 6;
+
 function LayananSlider({ section }) {
   const items = section?.items || [];
-  const [active, setActive] = useState(0);
   const [modalItem, setModalItem] = useState(null);
-  const current = items[active] || {};
-  const image = getItemImage(current);
-
-  function go(nextIndex) {
-    if (items.length === 0) return;
-    setActive((nextIndex + items.length) % items.length);
-  }
+  const [showAll, setShowAll] = useState(false);
+  const visibleItems = items.slice(0, LAYANAN_GALLERY_LIMIT);
+  const hasMore = items.length > LAYANAN_GALLERY_LIMIT;
 
   return (
     <section id="layanan" className="max-w-7xl mx-auto px-5 md:px-8 py-20">
-      <SectionHeader section={section} eyebrow="Standard Eyecare 2026">
-        {items.length > 1 && (
-          <div className="flex gap-2">
-            <ArrowButton direction="prev" onClick={() => go(active - 1)} />
-            <ArrowButton direction="next" onClick={() => go(active + 1)} />
-          </div>
-        )}
-      </SectionHeader>
+      <SectionHeader section={section} eyebrow="Standard Eyecare 2026" />
 
-      <button
-        type="button"
-        onClick={() => setModalItem(current)}
-        className="group relative block w-full rounded-3xl overflow-hidden border border-slate-100 bg-white aspect-[16/9] text-left shadow-2xl shadow-obsidian/5 hover:shadow-obsidian/15 transition duration-500"
-      >
-        {image ? (
-          <img
-            src={image}
-            alt={current.title || section?.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-        ) : (
-          fallbackImage(section?.title)
-        )}
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 bg-gradient-to-t from-obsidian-950 via-obsidian-950/70 to-transparent text-white">
-          {current.title && <h3 className="font-extrabold text-2xl sm:text-3xl text-white">{current.title}</h3>}
-          {current.desc && <p className="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">{current.desc}</p>}
-          <span className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-2xl bg-champagne text-obsidian font-extrabold text-xs uppercase tracking-wider group-hover:bg-champagne-gold transition shadow-lg">
-            <span>🔍 Zoom Galeri Foto</span>
-          </span>
-        </div>
-      </button>
-
-      {items.length > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
-          {items.map((item, i) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+        {visibleItems.map((item, i) => {
+          const image = getItemImage(item);
+          return (
             <button
               type="button"
               key={`${item.title || "layanan"}-${i}`}
-              onClick={() => setActive(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${active === i ? "w-8 bg-champagne" : "w-2 bg-slate-300"}`}
-              aria-label={`Slide ${i + 1}`}
-            />
-          ))}
+              onClick={() => setModalItem(item)}
+              className="group relative block w-full rounded-2xl overflow-hidden border border-slate-100 bg-white aspect-[4/3] text-left shadow-lg shadow-obsidian/5 hover:shadow-obsidian/15 transition duration-500"
+            >
+              {image ? (
+                <img
+                  src={image}
+                  alt={item.title || section?.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+              ) : (
+                fallbackImage(item.title || section?.title)
+              )}
+              {item.title && (
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 bg-gradient-to-t from-obsidian-950/90 via-obsidian-950/40 to-transparent text-white">
+                  <h3 className="font-bold text-sm sm:text-base text-white line-clamp-1">{item.title}</h3>
+                </div>
+              )}
+              <span className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 text-obsidian flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition">
+                🔍
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-champagne text-obsidian font-extrabold text-xs uppercase tracking-wider hover:bg-champagne-gold transition shadow-lg"
+          >
+            Lihat Semua Foto ({items.length})
+          </button>
         </div>
       )}
+
       <ImageModal item={modalItem} onClose={() => setModalItem(null)} />
+      <GalleryOverlay
+        open={showAll}
+        items={items}
+        onClose={() => setShowAll(false)}
+        onSelect={(item) => setModalItem(item)}
+      />
     </section>
   );
 }
