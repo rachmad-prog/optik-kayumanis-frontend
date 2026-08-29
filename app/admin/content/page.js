@@ -495,6 +495,18 @@ export default function AdminContentPage() {
     });
   }
 
+  // Same as addArrayItem but inserts at the front — used where newest items
+  // should show first (e.g. Slider Layanan photos on the homepage gallery).
+  function addArrayItemAtStart(arrayPath, template) {
+    setContent((prev) => {
+      const next = structuredClone(prev);
+      let arr = next;
+      for (const p of arrayPath) arr = arr[p];
+      arr.unshift(structuredClone(template));
+      return next;
+    });
+  }
+
   function removeArrayItem(arrayPath, index) {
     setContent((prev) => {
       const next = structuredClone(prev);
@@ -1384,7 +1396,7 @@ export default function AdminContentPage() {
             <AddRemove
               addLabel="Tambah Slide Layanan"
               onAdd={() =>
-                addArrayItem(["layananSlider", "items"], {
+                addArrayItemAtStart(["layananSlider", "items"], {
                   title: "Layanan baru",
                   desc: "Deskripsi layanan baru",
                   image: "",
