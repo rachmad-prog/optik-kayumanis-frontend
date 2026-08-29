@@ -32,7 +32,8 @@ function CartIcon(props) {
       width="20"
       height="20"
       aria-hidden="true"
-      {...props}>
+      {...props}
+    >
       <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
       <line x1="3" y1="6" x2="21" y2="6"></line>
       <path d="M16 10a4 4 0 0 1-8 0"></path>
@@ -52,7 +53,8 @@ function GlobeIcon(props) {
       width="14"
       height="14"
       aria-hidden="true"
-      {...props}>
+      {...props}
+    >
       <circle cx="12" cy="12" r="10" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -75,8 +77,7 @@ export default function Navbar({ content }) {
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-1.5 flex justify-between items-center gap-3">
           <p className="hidden sm:flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-champagne animate-pulse" />
-            {topbar.topbarLeft ||
-              "Periksa Mata Gratis di Seluruh Cabang Kayumanis • Tren Frame 2026"}
+            {topbar.topbarLeft || "Periksa Mata Gratis di Seluruh Cabang Kayumanis • Tren Frame 2026"}
           </p>
           <p className="mx-auto sm:mx-0 sm:mr-auto sm:ml-4 truncate font-medium text-slate-400">
             {topbar.topbarRight || "Garansi Lensa Presisi 100% Original"}
@@ -84,11 +85,10 @@ export default function Navbar({ content }) {
           <button
             onClick={toggleLang}
             aria-label="Switch language"
-            className="shrink-0 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800 hover:bg-champagne hover:text-obsidian text-slate-200 font-bold transition duration-200">
+            className="shrink-0 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800 hover:bg-champagne hover:text-obsidian text-slate-200 font-bold transition duration-200"
+          >
             <GlobeIcon />
-            <span className="tracking-wider">
-              {lang === "en" ? "EN" : "ID"}
-            </span>
+            <span className="tracking-wider">{lang === "en" ? "EN" : "ID"}</span>
           </button>
         </div>
       </div>
@@ -119,7 +119,8 @@ export default function Navbar({ content }) {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="hover:text-champagne-600 transition-colors py-2 relative group">
+                  className="hover:text-champagne-600 transition-colors py-2 relative group"
+                >
                   {t(link.key)}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-champagne transition-all duration-300 group-hover:w-full" />
                 </Link>
@@ -128,8 +129,9 @@ export default function Navbar({ content }) {
             <li>
               <Link
                 href="/store"
-                className="px-4 py-2 rounded-full bg-obsidian text-white hover:bg-champagne hover:text-obsidian transition-all shadow-md duration-300 flex items-center gap-1.5">
-                <span>✨ {t("store")}</span>
+                className="px-4 py-2 rounded-full bg-obsidian text-white hover:bg-champagne hover:text-obsidian transition-all shadow-md duration-300 flex items-center gap-1.5"
+              >
+                <span>✨ {t("store")} 2026</span>
               </Link>
             </li>
           </ul>
@@ -139,7 +141,8 @@ export default function Navbar({ content }) {
             <Link
               href="/cart"
               className="relative p-2 rounded-full bg-slate-100 text-obsidian hover:bg-champagne-100 hover:text-champagne-700 transition-colors"
-              aria-label={`${t("cart")}, ${totalQuantity} item`}>
+              aria-label={`${t("cart")}, ${totalQuantity} item`}
+            >
               <CartIcon />
               {totalQuantity > 0 && (
                 <span className="absolute -top-1 -right-1 bg-champagne-gold text-obsidian text-[10px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
@@ -152,21 +155,24 @@ export default function Navbar({ content }) {
               <div className="flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-full border border-slate-200">
                 <Link
                   href="/account"
-                  className="text-xs font-bold text-obsidian hover:text-champagne-600">
+                  className="text-xs font-bold text-obsidian hover:text-champagne-600"
+                >
                   {t("hi")}, {user.name.split(" ")[0]}
                 </Link>
 
                 {(user.role === "ADMIN" || user.role === "DIREKTUR") && (
                   <Link
                     href="/admin"
-                    className="text-xs font-bold text-champagne-600 hover:underline">
+                    className="text-xs font-bold text-champagne-600 hover:underline"
+                  >
                     {t("admin")}
                   </Link>
                 )}
 
                 <button
                   onClick={logout}
-                  className="text-xs font-semibold text-slate-400 hover:text-red-500 transition">
+                  className="text-xs font-semibold text-slate-400 hover:text-red-500 transition"
+                >
                   {t("logout")}
                 </button>
               </div>
@@ -174,12 +180,14 @@ export default function Navbar({ content }) {
               <div className="flex items-center gap-3">
                 <Link
                   href="/track-order"
-                  className="text-xs font-bold text-slate-500 hover:text-champagne-600">
+                  className="text-xs font-bold text-slate-500 hover:text-champagne-600"
+                >
                   Lacak Pesanan
                 </Link>
                 <Link
                   href="/login"
-                  className="text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full border border-obsidian text-obsidian hover:bg-obsidian hover:text-white transition-all shadow-sm">
+                  className="text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full border border-obsidian text-obsidian hover:bg-obsidian hover:text-white transition-all shadow-sm"
+                >
                   {t("login")}
                 </Link>
               </div>
@@ -190,12 +198,9 @@ export default function Navbar({ content }) {
           <button
             className="lg:hidden p-2 rounded-xl bg-slate-100 text-obsidian"
             onClick={() => setOpen((v) => !v)}
-            aria-label="Buka Menu Navigasi">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
+            aria-label="Buka Menu Navigasi"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -215,7 +220,8 @@ export default function Navbar({ content }) {
                   <Link
                     href={link.href}
                     className="block py-2 border-b border-slate-100 hover:text-champagne-600"
-                    onClick={() => setOpen(false)}>
+                    onClick={() => setOpen(false)}
+                  >
                     {t(link.key)}
                   </Link>
                 </li>
@@ -224,7 +230,8 @@ export default function Navbar({ content }) {
                 <Link
                   href="/store"
                   className="block py-3 px-4 rounded-xl bg-obsidian text-white text-center font-extrabold"
-                  onClick={() => setOpen(false)}>
+                  onClick={() => setOpen(false)}
+                >
                   ✨ Katalog Store 2026
                 </Link>
               </li>
@@ -232,7 +239,8 @@ export default function Navbar({ content }) {
                 <Link
                   href="/cart"
                   className="flex items-center justify-between py-2 border-b border-slate-100"
-                  onClick={() => setOpen(false)}>
+                  onClick={() => setOpen(false)}
+                >
                   <span>{t("cart")}</span>
                   <span className="px-2.5 py-0.5 rounded-full bg-champagne text-obsidian text-xs font-bold">
                     {totalQuantity} item
@@ -245,7 +253,8 @@ export default function Navbar({ content }) {
                     <Link
                       href="/account"
                       className="block py-2 text-slate-600"
-                      onClick={() => setOpen(false)}>
+                      onClick={() => setOpen(false)}
+                    >
                       {t("myAccount")}
                     </Link>
                   </li>
@@ -254,7 +263,8 @@ export default function Navbar({ content }) {
                       <Link
                         href="/admin"
                         className="block py-2 text-champagne-600 font-bold"
-                        onClick={() => setOpen(false)}>
+                        onClick={() => setOpen(false)}
+                      >
                         {t("admin")}
                       </Link>
                     </li>
@@ -262,7 +272,8 @@ export default function Navbar({ content }) {
                   <li>
                     <button
                       onClick={logout}
-                      className="text-left py-2 text-red-500 font-semibold w-full">
+                      className="text-left py-2 text-red-500 font-semibold w-full"
+                    >
                       {t("logout")}
                     </button>
                   </li>
@@ -273,7 +284,8 @@ export default function Navbar({ content }) {
                     <Link
                       href="/track-order"
                       className="block py-2 text-slate-600"
-                      onClick={() => setOpen(false)}>
+                      onClick={() => setOpen(false)}
+                    >
                       Lacak Pesanan
                     </Link>
                   </li>
@@ -281,7 +293,8 @@ export default function Navbar({ content }) {
                     <Link
                       href="/login"
                       className="block text-center py-3 rounded-xl border border-obsidian text-obsidian font-bold"
-                      onClick={() => setOpen(false)}>
+                      onClick={() => setOpen(false)}
+                    >
                       {t("login")}
                     </Link>
                   </li>

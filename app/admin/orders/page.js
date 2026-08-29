@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
 import { api, formatRupiah } from "../../../lib/api";
+import { PrinterProvider } from "../../../context/PrinterContext";
 import PrintReceiptButton from "../../../components/PrintReceiptButton";
 
 const STATUS_OPTIONS = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "COMPLETED", "CANCELLED", "EXPIRED"];
@@ -55,6 +56,14 @@ function ImageLightbox({ image, onClose }) {
 }
 
 export default function AdminOrdersPage() {
+  return (
+    <PrinterProvider>
+      <AdminOrdersPageInner />
+    </PrinterProvider>
+  );
+}
+
+function AdminOrdersPageInner() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

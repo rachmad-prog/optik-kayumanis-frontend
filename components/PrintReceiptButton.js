@@ -1,17 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  isUsbSupported,
-  isBluetoothSupported,
-  connectUsbPrinter,
-  connectBluetoothPrinter,
-  printViaUsb,
-  printViaBluetooth,
-  printViaBrowser,
-  buildEscPosReceipt,
-  PAPER_WIDTHS,
-} from "../lib/thermalPrinter";
+import { usePrinter } from "../context/PrinterContext";
+import { printViaBrowser, buildEscPosReceipt, PAPER_WIDTHS } from "../lib/thermalPrinter";
 
 function PrinterIcon(props) {
   return (
@@ -57,11 +48,20 @@ function Spinner(props) {
 export default function PrintReceiptButton({ order }) {
   const [open, setOpen] = useState(false);
   const [paperWidth, setPaperWidth] = useState("58");
-  const [connection, setConnection] = useState(null); // { type, label }
-  const [busy, setBusy] = useState(""); // "" | "connect-usb" | "connect-bt" | "printing"
-  const [error, setError] = useState("");
+  const [printing, setPrinting] = useState(false);
+  const [localError, setLocalError] = useState("");
   const panelRef = useRef(null);
-  const connRef = useRef(null); // holds actual device/characteristic refs (not put in state, not serializable-friendly)
+  const {
+    connection,
+    busy,
+    error,
+    setError,
+    connectUsb,
+    connectBluetooth,
+    printRaw,
+    isUsbSupported,
+    isBluetoothSupported,
+  } = usePrinter();
 
   useEffect(() => {
     const saved = typeof window !== "undefined" && localStorage.getItem("thermalPrinterPaperWidth");
@@ -90,58 +90,26 @@ export default function PrintReceiptButton({ order }) {
     localStorage.setItem("thermalPrinterPaperWidth", w);
   }
 
-  async function handleConnectUsb() {
-    setError("");
-    setBusy("connect-usb");
-    try {
-      const conn = await connectUsbPrinter();
-      connRef.current = conn;
-      setConnection({ type: "usb", label: conn.label });
-    } catch (err) {
-      if (err.name !== "NotFoundError") setError(err.message || "Gagal menyambungkan printer USB.");
-    } finally {
-      setBusy("");
-    }
-  }
-
-  async function handleConnectBluetooth() {
-    setError("");
-    setBusy("connect-bt");
-    try {
-      const conn = await connectBluetoothPrinter();
-      connRef.current = conn;
-      setConnection({ type: "bluetooth", label: conn.label });
-      conn.device.addEventListener("gattserverdisconnected", () => {
-        connRef.current = null;
-        setConnection(null);
-      });
-    } catch (err) {
-      if (err.name !== "NotFoundError") setError(err.message || "Gagal menyambungkan printer Bluetooth.");
-    } finally {
-      setBusy("");
-    }
-  }
-
   async function handlePrint() {
+    setLocalError("");
     setError("");
-    setBusy("printing");
+    setPrinting(true);
     try {
-      if (connRef.current?.type === "usb") {
+      if (connection) {
         const data = buildEscPosReceipt(order, paperWidth);
-        await printViaUsb(connRef.current, data);
-      } else if (connRef.current?.type === "bluetooth") {
-        const data = buildEscPosReceipt(order, paperWidth);
-        await printViaBluetooth(connRef.current, data);
+        await printRaw(data);
       } else {
         printViaBrowser(order, paperWidth);
       }
       setOpen(false);
     } catch (err) {
-      setError(err.message || "Gagal mencetak struk.");
+      setLocalError(err.message || "Gagal mencetak struk.");
     } finally {
-      setBusy("");
+      setPrinting(false);
     }
   }
+
+  const displayError = localError || error;
 
   return (
     <div className="relative" ref={panelRef}>
@@ -186,8 +154,8 @@ export default function PrintReceiptButton({ order }) {
 
             <button
               type="button"
-              onClick={handleConnectUsb}
-              disabled={!isUsbSupported() || busy !== ""}
+              onClick={connectUsb}
+              disabled={!isUsbSupported || busy !== ""}
               className="flex w-full items-center justify-between rounded-xl border border-sand px-3 py-2 text-xs text-bark-500 hover:border-cinnamon-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="flex items-center gap-2">
@@ -205,8 +173,8 @@ export default function PrintReceiptButton({ order }) {
 
             <button
               type="button"
-              onClick={handleConnectBluetooth}
-              disabled={!isBluetoothSupported() || busy !== ""}
+              onClick={connectBluetooth}
+              disabled={!isBluetoothSupported || busy !== ""}
               className="flex w-full items-center justify-between rounded-xl border border-sand px-3 py-2 text-xs text-bark-500 hover:border-cinnamon-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="flex items-center gap-2">
@@ -222,22 +190,22 @@ export default function PrintReceiptButton({ order }) {
               )}
             </button>
 
-            {(!isUsbSupported() || !isBluetoothSupported()) && (
+            {(!isUsbSupported || !isBluetoothSupported) && (
               <p className="text-[11px] leading-relaxed text-bark-300">
                 Sebagian koneksi tidak didukung browser ini — gunakan Chrome/Edge untuk USB atau Bluetooth langsung, atau cetak lewat browser di bawah.
               </p>
             )}
           </div>
 
-          {error && <p className="mb-2 text-[11px] text-red-500">{error}</p>}
+          {displayError && <p className="mb-2 text-[11px] text-red-500">{displayError}</p>}
 
           <button
             type="button"
             onClick={handlePrint}
-            disabled={busy !== ""}
+            disabled={printing || busy !== ""}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-cinnamon-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cinnamon-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {busy === "printing" ? (
+            {printing ? (
               <Spinner style={{ width: 15, height: 15 }} />
             ) : (
               <PrinterIcon style={{ width: 15, height: 15 }} />
