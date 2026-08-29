@@ -122,7 +122,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="max-w-7xl mx-auto px-5 md:px-8 py-10 pb-24 md:pb-10 grid md:grid-cols-[220px_1fr] gap-8">
       {/* Sidebar — desktop only */}
-      <aside className="hidden md:block space-y-1">
+      <aside className="hidden md:block space-y-1 md:sticky md:top-10 md:self-start md:max-h-[calc(100vh-5rem)] md:overflow-y-auto">
         <p className="font-display text-lg text-bark-700 mb-4">Admin Panel</p>
 
         {/* Menu Navigasi Utama */}
