@@ -748,6 +748,25 @@ export default function AdminContentPage() {
             }
             saving={savingMap.heroSlides}
             status={statusMap.heroSlides}>
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["hero", "slides"], {
+                    image: "",
+                    tag: "Label Baru",
+                    title: "Judul baru",
+                    desc: "Deskripsi baru",
+                    ctaPrimaryLabel: "Lihat Koleksi",
+                    ctaPrimaryHref: "/shop",
+                    ctaSecondaryLabel: "",
+                    ctaSecondaryHref: "",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Slide
+              </button>
+            </div>
             {content.hero.slides.map((slide, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-4">
                 <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
@@ -880,26 +899,14 @@ export default function AdminContentPage() {
                     }
                   />
                 </div>
-                <AddRemove
-                  addLabel="Tambah Slide"
-                  onAdd={() =>
-                    addArrayItem(["hero", "slides"], {
-                      image: "",
-                      tag: "Label Baru",
-                      title: "Judul baru",
-                      desc: "Deskripsi baru",
-                      ctaPrimaryLabel: "Lihat Koleksi",
-                      ctaPrimaryHref: "/shop",
-                      ctaSecondaryLabel: "",
-                      ctaSecondaryHref: "",
-                    })
-                  }
-                  onRemove={
-                    content.hero.slides.length > 1
-                      ? () => removeArrayItem(["hero", "slides"], i)
-                      : null
-                  }
-                />
+                {content.hero.slides.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["hero", "slides"], i)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
+                  </button>
+                )}
               </div>
             ))}
           </Section>
@@ -924,6 +931,21 @@ export default function AdminContentPage() {
             <p className="text-xs text-bark-300 mb-4">
               Upload gambar banner promo untuk bagian atas halaman Store/Katalog. Jika mengunggah lebih dari 1 gambar, banner akan otomatis menjadi slider bergantian.
             </p>
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["storeSlides"], {
+                    image: "",
+                    title: "Banner Promo Baru",
+                    desc: "Deskripsi promo baru.",
+                    link: "",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Banner Store
+              </button>
+            </div>
             {(content.storeSlides || []).map((slide, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-4">
                 <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
@@ -961,37 +983,16 @@ export default function AdminContentPage() {
                     updateArrayItem(["storeSlides"], i, "link", v)
                   }
                 />
-                <AddRemove
-                  addLabel="Tambah Banner Store"
-                  onAdd={() =>
-                    addArrayItem(["storeSlides"], {
-                      image: "",
-                      title: "Banner Promo Baru",
-                      desc: "Deskripsi promo baru.",
-                      link: "",
-                    })
-                  }
-                  onRemove={
-                    (content.storeSlides || []).length > 1
-                      ? () => removeArrayItem(["storeSlides"], i)
-                      : null
-                  }
-                />
+                {(content.storeSlides || []).length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["storeSlides"], i)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
+                  </button>
+                )}
               </div>
             ))}
-            {(!content.storeSlides || content.storeSlides.length === 0) && (
-              <AddRemove
-                addLabel="Tambah Banner Store"
-                onAdd={() =>
-                  addArrayItem(["storeSlides"], {
-                    image: "",
-                    title: "Banner Promo",
-                    desc: "Deskripsi promo.",
-                    link: "",
-                  })
-                }
-              />
-            )}
           </Section>
         </div>
       )}
@@ -1004,6 +1005,14 @@ export default function AdminContentPage() {
             onSave={() => saveSection("marquee", { marquee: content.marquee })}
             saving={savingMap.marquee}
             status={statusMap.marquee}>
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => addArrayItem(["marquee"], "Teks baru")}
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Teks
+              </button>
+            </div>
             {content.marquee.map((item, i) => (
               <div key={i} className="flex gap-2 mb-2">
                 <input
@@ -1027,10 +1036,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Teks"
-              onAdd={() => addArrayItem(["marquee"], "Teks baru")}
-            />
           </Section>
         </div>
       )}
@@ -1055,6 +1060,19 @@ export default function AdminContentPage() {
               value={content.valueProps.title}
               onChange={(v) => update(["valueProps", "title"], v)}
             />
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["valueProps", "items"], {
+                    title: "Judul baru",
+                    desc: "Deskripsi baru",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Kartu
+              </button>
+            </div>
             {content.valueProps.items.map((item, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-3">
                 <Field
@@ -1073,23 +1091,15 @@ export default function AdminContentPage() {
                   textarea
                 />
                 {content.valueProps.items.length > 1 && (
-                  <AddRemove
-                    addLabel=""
-                    onAdd={() => {}}
-                    onRemove={() => removeArrayItem(["valueProps", "items"], i)}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(["valueProps", "items"], i)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                    Hapus
+                  </button>
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Kartu"
-              onAdd={() =>
-                addArrayItem(["valueProps", "items"], {
-                  title: "Judul baru",
-                  desc: "Deskripsi baru",
-                })
-              }
-            />
           </Section>
         </div>
       )}
@@ -1155,6 +1165,14 @@ export default function AdminContentPage() {
             <p className="text-sm font-semibold text-bark-700 mb-2">
               Daftar poin (bullet)
             </p>
+            <div className="mb-2">
+              <button
+                type="button"
+                onClick={() => addArrayItem(["layanan", "bullets"], "Poin baru")}
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Poin
+              </button>
+            </div>
             {content.layanan.bullets.map((b, i) => (
               <div key={i} className="flex gap-2 mb-2">
                 <input
@@ -1178,10 +1196,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Poin"
-              onAdd={() => addArrayItem(["layanan", "bullets"], "Poin baru")}
-            />
             <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
               Tombol CTA & WhatsApp
             </p>
@@ -1244,6 +1258,19 @@ export default function AdminContentPage() {
             <p className="text-sm font-semibold text-bark-700 mb-2">
               Statistik (angka pencapaian)
             </p>
+            <div className="mb-3">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["tentang", "stats"], {
+                    value: "0",
+                    label: "Label baru",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Statistik
+              </button>
+            </div>
             <div className="grid sm:grid-cols-3 gap-3">
               {content.tentang.stats.map((s, i) => (
                 <div key={i} className="border border-sand rounded-xl p-3">
@@ -1272,15 +1299,6 @@ export default function AdminContentPage() {
                 </div>
               ))}
             </div>
-            <AddRemove
-              addLabel="Tambah Statistik"
-              onAdd={() =>
-                addArrayItem(["tentang", "stats"], {
-                  value: "0",
-                  label: "Label baru",
-                })
-              }
-            />
 
             <MediaField
               label="Gambar / video (sisi kiri section)"
@@ -1411,16 +1429,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Slide Layanan"
-              onAdd={() =>
-                addArrayItemAtStart(["layananSlider", "items"], {
-                  title: "Layanan baru",
-                  desc: "Deskripsi layanan baru",
-                  image: "",
-                })
-              }
-            />
           </Section>
         </div>
       )}
@@ -1456,6 +1464,20 @@ export default function AdminContentPage() {
                 onChange={(v) => update(["cabang", "ctaHref"], v)}
                 hint="Isi URL manual, misalnya link WhatsApp atau Google Maps."
               />
+            </div>
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["cabang", "items"], {
+                    title: "Cabang baru",
+                    desc: "Alamat cabang baru",
+                    image: "",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Slide Cabang
+              </button>
             </div>
             {content.cabang.items.map((item, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-4">
@@ -1531,16 +1553,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Slide Cabang"
-              onAdd={() =>
-                addArrayItem(["cabang", "items"], {
-                  title: "Cabang baru",
-                  desc: "Alamat cabang baru",
-                  image: "",
-                })
-              }
-            />
           </Section>
         </div>
       )}
@@ -1566,6 +1578,19 @@ export default function AdminContentPage() {
               onChange={(v) => update(["sponsors", "subtitle"], v)}
               textarea
             />
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(["sponsors", "items"], {
+                    name: "Sponsor baru",
+                    image: "",
+                  })
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Foto Sponsor
+              </button>
+            </div>
             {content.sponsors.items.map((item, i) => (
               <div key={i} className="border border-sand rounded-xl p-4 mb-4">
                 <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
@@ -1632,15 +1657,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Foto Sponsor"
-              onAdd={() =>
-                addArrayItem(["sponsors", "items"], {
-                  name: "Sponsor baru",
-                  image: "",
-                })
-              }
-            />
           </Section>
         </div>
       )}
@@ -1714,6 +1730,19 @@ export default function AdminContentPage() {
             <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
               Jam operasional
             </p>
+            <div className="mb-2">
+              <button
+                type="button"
+                onClick={() =>
+                  addArrayItem(
+                    ["footer", "hours"],
+                    "Setiap Hari: 09.00 â€“ 20.00",
+                  )
+                }
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-cinnamon-300 text-cinnamon-600 hover:bg-cinnamon-50">
+                + Tambah Baris Jam
+              </button>
+            </div>
             {content.footer.hours.map((h, i) => (
               <div key={i} className="flex gap-2 mb-2">
                 <input
@@ -1737,15 +1766,6 @@ export default function AdminContentPage() {
                 )}
               </div>
             ))}
-            <AddRemove
-              addLabel="Tambah Baris Jam"
-              onAdd={() =>
-                addArrayItem(
-                  ["footer", "hours"],
-                  "Setiap Hari: 09.00 â€“ 20.00",
-                )
-              }
-            />
 
             <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
               Link Media Sosial
