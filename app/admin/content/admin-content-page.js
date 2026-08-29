@@ -53,7 +53,12 @@ function Field({ label, value, onChange, textarea, hint }) {
   );
 }
 
-function Section({ title, children, onSave, saving, status }) {
+function Section({ title, children, onSave, saving, uploading, status }) {
+  // `uploading` = true when an image inside this section is still being
+  // uploaded/verified. We block Simpan in that case — otherwise the request
+  // can fire before the newly uploaded image URL has landed in state,
+  // silently saving the OLD image instead of the one the admin just picked.
+  const blocked = saving || uploading;
   return (
     <div className="bg-white border border-sand rounded-2xl p-6 mb-6">
       <h2 className="font-display text-lg text-bark-700 mb-4">{title}</h2>
@@ -66,10 +71,15 @@ function Section({ title, children, onSave, saving, status }) {
               {status.message}
             </p>
           )}
+          {uploading && !saving && (
+            <p className="text-xs text-bark-300">
+              Menunggu upload gambar selesai...
+            </p>
+          )}
           <button
             type="button"
             onClick={onSave}
-            disabled={saving}
+            disabled={blocked}
             className="shrink-0 bg-cinnamon-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-cinnamon-600 disabled:opacity-50">
             {saving ? "Menyimpan..." : "Simpan"}
           </button>
@@ -480,6 +490,13 @@ export default function AdminContentPage() {
     }
   }
 
+  // True if any of the given slideUploading keys is currently uploading.
+  // Used to disable a section's Simpan button while its images are still
+  // being uploaded/verified, so we never save a stale image URL.
+  function anyUploading(keys) {
+    return keys.some((k) => Boolean(slideUploading[k]));
+  }
+
   // Saves only the given slice of content (e.g. { hero: { topbarLeft, topbarRight } })
   // instead of the whole page, so each section's button only touches its own data.
   async function saveSection(id, payload) {
@@ -551,6 +568,7 @@ export default function AdminContentPage() {
           saveSection("heroSlides", { hero: { slides: content.hero.slides } })
         }
         saving={savingMap.heroSlides}
+        uploading={anyUploading(content.hero.slides.map((_, i) => i))}
         status={statusMap.heroSlides}>
         {content.hero.slides.map((slide, i) => (
           <div key={i} className="border border-sand rounded-xl p-4 mb-4">
@@ -836,6 +854,9 @@ export default function AdminContentPage() {
           saveSection("layananSlider", { layananSlider: content.layananSlider })
         }
         saving={savingMap.layananSlider}
+        uploading={anyUploading(
+          content.layananSlider.items.map((_, i) => `layananSlider-${i}`),
+        )}
         status={statusMap.layananSlider}>
         <Field
           label="Judul"
@@ -913,6 +934,9 @@ export default function AdminContentPage() {
         title='Section "Cabang Optik Kayumanis"'
         onSave={() => saveSection("cabang", { cabang: content.cabang })}
         saving={savingMap.cabang}
+        uploading={anyUploading(
+          content.cabang.items.map((_, i) => `cabang-${i}`),
+        )}
         status={statusMap.cabang}>
         <Field
           label="Judul"
@@ -998,6 +1022,9 @@ export default function AdminContentPage() {
         title="Slider Sponsor & Partner"
         onSave={() => saveSection("sponsors", { sponsors: content.sponsors })}
         saving={savingMap.sponsors}
+        uploading={anyUploading(
+          content.sponsors.items.map((_, i) => `sponsor-${i}`),
+        )}
         status={statusMap.sponsors}>
         <Field
           label="Judul"
@@ -1061,6 +1088,7 @@ export default function AdminContentPage() {
         title="Section Kontak"
         onSave={() => saveSection("kontak", { kontak: content.kontak })}
         saving={savingMap.kontak}
+        uploading={anyUploading(["kontakImage"])}
         status={statusMap.kontak}>
         <Field
           label="Judul"
