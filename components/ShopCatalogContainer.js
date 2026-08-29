@@ -5,7 +5,126 @@ import ProductCard from "./ProductCard";
 import FrameShapeFilter from "./FrameShapeFilter";
 import FaceShapeQuizModal from "./FaceShapeQuizModal";
 
-export default function ShopCatalogContainer({ initialProducts, categories, currentCategory, initialQuery }) {
+function StoreHeroBanner({ storeSlides, onOpenQuiz }) {
+  const slides = (storeSlides || []).filter((s) => s && (s.image || s.title || s.desc));
+  const [active, setActive] = useState(0);
+
+  const validSlides = slides.filter((s) => Boolean(s.image));
+  const hasImages = validSlides.length > 0;
+
+  if (hasImages) {
+    const current = validSlides[active % validSlides.length] || validSlides[0];
+    const isMultiple = validSlides.length > 1;
+
+    function go(nextIndex) {
+      setActive((nextIndex + validSlides.length) % validSlides.length);
+    }
+
+    return (
+      <div className="relative rounded-3xl overflow-hidden mb-10 shadow-xl border border-slate-100 bg-obsidian group">
+        <div className="relative w-full aspect-[21/9] sm:aspect-[21/8] min-h-[220px] sm:min-h-[320px] overflow-hidden">
+          {current.link ? (
+            <a href={current.link} target={current.link.startsWith("http") ? "_blank" : "_self"} rel="noreferrer">
+              <img
+                src={current.image}
+                alt={current.title || "Banner Store"}
+                className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
+              />
+            </a>
+          ) : (
+            <img
+              src={current.image}
+              alt={current.title || "Banner Store"}
+              className="w-full h-full object-cover"
+            />
+          )}
+
+          {(current.title || current.desc) && (
+            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 bg-gradient-to-t from-obsidian/90 via-obsidian/40 to-transparent text-white">
+              {current.title && <h2 className="text-xl sm:text-3xl font-extrabold text-white">{current.title}</h2>}
+              {current.desc && <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-xl">{current.desc}</p>}
+            </div>
+          )}
+        </div>
+
+        {isMultiple && (
+          <>
+            <button
+              type="button"
+              onClick={() => go(active - 1)}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-cinnamon text-white flex items-center justify-center transition shadow-md"
+              aria-label="Previous Banner"
+            >
+              ❮
+            </button>
+            <button
+              type="button"
+              onClick={() => go(active + 1)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-cinnamon text-white flex items-center justify-center transition shadow-md"
+              aria-label="Next Banner"
+            >
+              ❯
+            </button>
+
+            <div className="absolute bottom-3 inset-x-0 flex justify-center gap-2 z-10">
+              {validSlides.map((_, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setActive(i)}
+                  className={`h-2 rounded-full transition-all duration-300 ${active % validSlides.length === i ? "w-8 bg-cinnamon" : "w-2 bg-white/60"}`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative rounded-3xl overflow-hidden bg-obsidian text-white p-8 md:p-12 mb-10 shadow-2xl bg-mesh-dark border border-slate-800">
+      <div className="max-w-2xl relative z-10">
+        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-champagne/20 text-champagne text-xs font-bold uppercase tracking-widest mb-4 border border-champagne/30">
+          ✨ Collection 2026 • Eyewear & Eyecare
+        </span>
+        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+          Katalog Frame & Lensa <span className="text-champagne">Ultra Elegant</span>
+        </h1>
+        <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-6">
+          Temukan desain kacamata terkini berstandar presisi optik. Diproduksi dengan material Titanium ringan, TR90 fleksibel, dan lensa anti-radiasi terkini.
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={onOpenQuiz}
+            className="px-5 py-3 bg-gradient-to-r from-champagne-gold to-champagne hover:from-champagne hover:to-champagne-600 text-obsidian font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-champagne/20 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+          >
+            <span>✨ Bingung Pilih? Ikuti Quiz Bentuk Wajah</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 w-72 p-5 glass-panel-dark rounded-2xl border border-white/10 shadow-glow text-slate-200 text-xs leading-relaxed">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-8 rounded-full bg-champagne/20 text-champagne font-bold flex items-center justify-center">
+            ✓
+          </div>
+          <div>
+            <p className="font-bold text-white">Garansi Optik Kayumanis</p>
+            <p className="text-[11px] text-slate-400">100% Lensa Presisi & Original</p>
+          </div>
+        </div>
+        <p className="text-[11px] text-slate-300">
+          Setiap pembelian frame sudah termasuk pembersihan ultrasonik dan garansi penyetelan ulang gratis.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function ShopCatalogContainer({ initialProducts, categories, currentCategory, initialQuery, storeSlides }) {
   const [products, setProducts] = useState(initialProducts);
   const [selectedShape, setSelectedShape] = useState("all");
   const [searchQuery, setSearchQuery] = useState(initialQuery || "");
@@ -53,46 +172,8 @@ export default function ShopCatalogContainer({ initialProducts, categories, curr
         }}
       />
 
-      {/* Hero Banner Halaman Store 2026 */}
-      <div className="relative rounded-3xl overflow-hidden bg-obsidian text-white p-8 md:p-12 mb-10 shadow-2xl bg-mesh-dark border border-slate-800">
-        <div className="max-w-2xl relative z-10">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-champagne/20 text-champagne text-xs font-bold uppercase tracking-widest mb-4 border border-champagne/30">
-            ✨ Collection 2026 • Eyewear & Eyecare
-          </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
-            Katalog Frame & Lensa <span className="text-champagne">Ultra Elegant</span>
-          </h1>
-          <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-6">
-            Temukan desain kacamata terkini berstandar presisi optik. Diproduksi dengan material Titanium ringan, TR90 fleksibel, dan lensa anti-radiasi terkini.
-          </p>
-
-          {/* Action Pills */}
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setIsQuizOpen(true)}
-              className="px-5 py-3 bg-gradient-to-r from-champagne-gold to-champagne hover:from-champagne hover:to-champagne-600 text-obsidian font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-champagne/20 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <span>✨ Bingung Pilih? Ikuti Quiz Bentuk Wajah</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Decorative Glass Badge */}
-        <div className="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 w-72 p-5 glass-panel-dark rounded-2xl border border-white/10 shadow-glow text-slate-200 text-xs leading-relaxed">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-full bg-champagne/20 text-champagne font-bold flex items-center justify-center">
-              ✓
-            </div>
-            <div>
-              <p className="font-bold text-white">Garansi Optik Kayumanis</p>
-              <p className="text-[11px] text-slate-400">100% Lensa Presisi & Original</p>
-            </div>
-          </div>
-          <p className="text-[11px] text-slate-300">
-            Setiap pembelian frame sudah termasuk pembersihan ultrasonik dan garansi penyetelan ulang gratis.
-          </p>
-        </div>
-      </div>
+      {/* Store Hero Banner Slider */}
+      <StoreHeroBanner storeSlides={storeSlides} onOpenQuiz={() => setIsQuizOpen(true)} />
 
       {/* Control Bar: Search, Category Chips & Sort */}
       <div className="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-card-modern mb-8">

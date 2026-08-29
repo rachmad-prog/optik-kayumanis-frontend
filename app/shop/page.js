@@ -1,5 +1,6 @@
 import { api } from "../../lib/api";
 import ShopCatalogContainer from "../../components/ShopCatalogContainer";
+import { DEFAULT_CONTENT } from "../../lib/defaultContent";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -27,10 +28,20 @@ async function getCategories() {
   }
 }
 
+async function getContent() {
+  try {
+    const data = await api.get("/content", null, { cache: "no-store" });
+    return data.content || DEFAULT_CONTENT;
+  } catch {
+    return DEFAULT_CONTENT;
+  }
+}
+
 export default async function ShopPage({ searchParams }) {
-  const [products, categories] = await Promise.all([
+  const [products, categories, content] = await Promise.all([
     getProducts(searchParams),
     getCategories(),
+    getContent(),
   ]);
 
   return (
@@ -40,6 +51,7 @@ export default async function ShopPage({ searchParams }) {
         categories={categories}
         currentCategory={searchParams.category}
         initialQuery={searchParams.q}
+        storeSlides={content?.storeSlides}
       />
     </div>
   );

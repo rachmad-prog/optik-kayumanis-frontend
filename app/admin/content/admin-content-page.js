@@ -795,6 +795,104 @@ export default function AdminContentPage() {
         </p>
       </Section>
 
+      {/* Banner Store / Katalog */}
+      <Section
+        title="Banner Halaman Store / Katalog (Promo Slider)"
+        onSave={() =>
+          saveSection("storeSlides", {
+            storeSlides: content.storeSlides || [],
+          })
+        }
+        saving={savingMap.storeSlides}
+        uploading={anyUploading(
+          (content.storeSlides || []).map((_, i) => `storeSlide-${i}`),
+        )}
+        status={statusMap.storeSlides}>
+        <p className="text-xs text-bark-300 mb-4">
+          Upload gambar banner promo untuk bagian atas halaman Store/Katalog. Jika mengunggah lebih dari 1 gambar, banner akan otomatis menjadi slider bergantian.
+        </p>
+        {(content.storeSlides || []).map((slide, i) => (
+          <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+            <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+              Banner Store {i + 1}
+            </p>
+            <ImageUploadField
+              label="Gambar Banner Promo"
+              image={slide.image}
+              uploading={slideUploading[`storeSlide-${i}`]}
+              onUpload={(file) =>
+                uploadContentImage(
+                  `storeSlide-${i}`,
+                  (url) =>
+                    updateArrayItem(
+                      ["storeSlides"],
+                      i,
+                      "image",
+                      url,
+                    ),
+                  file,
+                )
+              }
+              onRemove={() =>
+                updateArrayItem(["storeSlides"], i, "image", "")
+              }
+            />
+            <Field
+              label="Judul Banner (Opsional)"
+              value={slide.title || ""}
+              onChange={(v) =>
+                updateArrayItem(["storeSlides"], i, "title", v)
+              }
+            />
+            <Field
+              label="Deskripsi / Subjudul (Opsional)"
+              value={slide.desc || ""}
+              onChange={(v) =>
+                updateArrayItem(["storeSlides"], i, "desc", v)
+              }
+              textarea
+            />
+            <Field
+              label="Link saat banner diklik (Opsional)"
+              hint='Contoh: "/store?category=kacamata-optik" atau "https://wa.me/..."'
+              value={slide.link || ""}
+              onChange={(v) =>
+                updateArrayItem(["storeSlides"], i, "link", v)
+              }
+            />
+            <AddRemove
+              addLabel="Tambah Banner Store"
+              onAdd={() =>
+                addArrayItem(["storeSlides"], {
+                  image: "",
+                  title: "Banner Promo Baru",
+                  desc: "Deskripsi promo baru.",
+                  link: "",
+                })
+              }
+              onRemove={
+                (content.storeSlides || []).length > 1
+                  ? () => removeArrayItem(["storeSlides"], i)
+                  : null
+              }
+            />
+          </div>
+        ))}
+        {(!content.storeSlides || content.storeSlides.length === 0) && (
+          <AddRemove
+            addLabel="Tambah Banner Store"
+            onAdd={() =>
+              addArrayItem(["storeSlides"], {
+                image: "",
+                title: "Banner Promo",
+                desc: "Deskripsi promo.",
+                link: "",
+              })
+            }
+          />
+        )}
+      </Section>
+
       <CategoryImagesPanel token={token} />
 
       {/* Layanan */}
