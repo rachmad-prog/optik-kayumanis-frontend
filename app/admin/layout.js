@@ -73,6 +73,16 @@ function ContentIcon(props) {
   );
 }
 
+function ArticleIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round" width="20" height="20" aria-hidden="true" {...props}>
+      <path d="M4 4h16v4H4zM4 12h10M4 16h6" />
+      <path d="M14 14l2 2 4-4" />
+    </svg>
+  );
+}
+
 function LogoutIcon(props) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -91,6 +101,7 @@ const links = [
   { href: "/admin/users", label: "Kelola User", shortLabel: "User", icon: UsersIcon },
   { href: "/admin/bank-accounts", label: "Rekening Bank", shortLabel: "Rekening", icon: BankIcon },
   { href: "/admin/content", label: "Konten Halaman", shortLabel: "Konten", icon: ContentIcon },
+  { href: "/admin/articles", label: "Artikel", shortLabel: "Artikel", icon: ArticleIcon },
 ];
 
 export default function AdminLayout({ children }) {
@@ -147,7 +158,22 @@ export default function AdminLayout({ children }) {
 
         {/* 🔑 TOMBOL LISENSI DAN TOKEN (HANYA MUNCUL DI SIDEBAR JIKA ROLE = DIREKTUR) */}
         {user.role === "DIREKTUR" && (
-          <div className="pt-4 border-t border-sand mb-4">
+          <div className="pt-4 border-t border-sand mb-4 space-y-2">
+            <Link
+              href="/admin/tracking"
+              className={`flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-medium ${
+                pathname === "/admin/tracking"
+                  ? "bg-cinnamon-500 text-white"
+                  : "text-bark-500 hover:bg-sand"
+              }`}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                strokeLinecap="round" strokeLinejoin="round" width="20" height="20" aria-hidden="true">
+                <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+                <path d="M13 13l6 6" />
+              </svg>
+              Tracking &amp; Pixel
+            </Link>
             <button
               onClick={() => setIsModalOpen(true)}
               className="w-full text-left px-4 py-2.5 bg-cinnamon-600 hover:bg-cinnamon-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2">
@@ -186,7 +212,7 @@ export default function AdminLayout({ children }) {
 
       {/* Bottom tab bar — mobile only, app-style navigation */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-sand pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-8">
           {links.map((link) => {
             const Icon = link.icon;
             const active = pathname === link.href;
