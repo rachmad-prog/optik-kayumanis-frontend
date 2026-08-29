@@ -415,6 +415,28 @@ export default function AdminContentPage() {
     }
   }
 
+  // Uploads an image for Store promo banner slide
+  async function uploadStoreSlideImage(index, file) {
+    const uploadKey = `storeSlide-${index}`;
+    setSlideUploading((m) => ({ ...m, [uploadKey]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("files", file);
+      const data = await api.upload("/uploads", formData, token);
+      updateArrayItem(["storeSlides"], index, "image", data.urls[0]);
+    } catch (err) {
+      setStatusMap((m) => ({
+        ...m,
+        storeSlides: {
+          ok: false,
+          message: err.message || "Gagal mengunggah gambar.",
+        },
+      }));
+    } finally {
+      setSlideUploading((m) => ({ ...m, [uploadKey]: false }));
+    }
+  }
+
   // Uploads an image/video for the Layanan section's right-side media slot.
   async function uploadLayananMedia(file) {
     setLayananMediaUploading(true);
@@ -778,19 +800,7 @@ export default function AdminContentPage() {
                   label="Gambar Banner Promo"
                   image={slide.image}
                   uploading={slideUploading[`storeSlide-${i}`]}
-                  onUpload={(file) =>
-                    uploadContentImage(
-                      `storeSlide-${i}`,
-                      (url) =>
-                        updateArrayItem(
-                          ["storeSlides"],
-                          i,
-                          "image",
-                          url,
-                        ),
-                      file,
-                    )
-                  }
+                  onUpload={(file) => uploadStoreSlideImage(i, file)}
                   onRemove={() =>
                     updateArrayItem(["storeSlides"], i, "image", "")
                   }
