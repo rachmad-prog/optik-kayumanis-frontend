@@ -27,14 +27,14 @@ export default function CartPage() {
       <div className="grid md:grid-cols-3 gap-10">
         <div className="md:col-span-2 space-y-4">
           {items.map((item) => (
-            <div key={item.productId} className="flex gap-4 bg-white border border-sand rounded-2xl p-4">
+            <div key={item.productId} className="flex flex-wrap sm:flex-nowrap gap-4 bg-white border border-sand rounded-2xl p-4">
               <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-sand shrink-0">
                 {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
               </div>
-              <div className="flex-1">
-                <h3 className="font-display text-base text-bark-700 mb-1">{item.name}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display text-base text-bark-700 mb-1 break-words">{item.name}</h3>
                 <p className="font-mono text-sm text-cinnamon-600 mb-2">{formatRupiah(item.price)}</p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex items-center border border-sand rounded-full">
                     <button
                       onClick={() => updateQuantity(item.productId, item.quantity - 1)}
@@ -60,7 +60,7 @@ export default function CartPage() {
                   </button>
                 </div>
               </div>
-              <p className="font-mono text-sm text-bark-700 self-start">
+              <p className="font-mono text-sm text-bark-700 w-full sm:w-auto text-right sm:self-start shrink-0">
                 {formatRupiah(item.price * item.quantity)}
               </p>
             </div>
