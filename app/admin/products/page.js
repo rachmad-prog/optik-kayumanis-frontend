@@ -28,7 +28,10 @@ export default function AdminProductsPage() {
   async function handleDelete(id) {
     if (!confirm("Hapus produk ini?")) return;
     try {
-      await api.del(`/products/${id}`, token);
+      const res = await api.del(`/products/${id}`, token);
+      if (res?.softDeleted) {
+        alert(res.message);
+      }
       loadProducts();
     } catch (err) {
       alert(err.message);
