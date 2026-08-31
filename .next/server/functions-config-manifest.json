@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/articles":{},"/product/[slug]":{},"/shop":{},"/articles/[slug]":{},"/":{},"/license-expired":{}}}
+{"version":1,"functions":{"/articles/[slug]":{},"/":{},"/shop":{},"/product/[slug]":{},"/license-expired":{},"/articles":{}}}
