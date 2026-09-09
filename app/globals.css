@@ -13,11 +13,8 @@ html {
 body {
   background-color: #FAF9F6;
   color: #0F172A;
-  overflow-x: hidden;
-  width: 100%;
   max-width: 100vw;
   position: relative;
-  overscroll-behavior-x: none;
 }
 
 /* Glassmorphism Utilities */
