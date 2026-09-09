@@ -94,8 +94,8 @@ export default function Navbar({ content }) {
         </div>
       </div>
 
-      {/* Main Glass Floating Nav — Sticky at top on scroll */}
-      <header className="sticky top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+      {/* Main Navigation Bar — static at top, does not follow scroll */}
+      <header className="relative z-40 bg-white border-b border-slate-200/80 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-20">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
