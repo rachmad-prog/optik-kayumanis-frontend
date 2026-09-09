@@ -70,9 +70,9 @@ export default function Navbar({ content }) {
   const topbar = content?.hero || {};
 
   return (
-    <header className="sticky top-0 z-50 transition-all duration-300">
-      {/* Top Banner Bar */}
-      <div className="bg-obsidian text-slate-300 text-[11px] border-b border-slate-800">
+    <>
+      {/* Top Banner Bar — scrolls away with page */}
+      <div className="bg-obsidian text-slate-300 text-[11px] border-b border-slate-800 relative z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-1.5 flex justify-between items-center gap-3">
           <p className="hidden sm:flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-champagne animate-pulse" />
@@ -94,8 +94,8 @@ export default function Navbar({ content }) {
         </div>
       </div>
 
-      {/* Main Glass Floating Nav */}
-      <div className="bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+      {/* Main Glass Floating Nav — Sticky at top on scroll */}
+      <header className="sticky top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-20">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
@@ -291,7 +291,7 @@ export default function Navbar({ content }) {
             </ul>
           </div>
         )}
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

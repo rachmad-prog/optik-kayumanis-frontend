@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 function getItemImage(item) {
   return item?.image || item?.imageUrl || "";
@@ -450,11 +451,91 @@ function ContactSection({ contact, footer }) {
   );
 }
 
-export default function HomeContentSections({ content }) {
+function formatDate(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function HomeArticlesSection({ articles }) {
+  if (!articles || articles.length === 0) return null;
+
+  return (
+    <section id="artikel" className="max-w-7xl mx-auto px-5 md:px-8 py-20 border-t border-slate-200/80">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+        <div>
+          <span className="inline-block px-3.5 py-1 bg-cinnamon/10 text-cinnamon font-extrabold uppercase tracking-widest text-[11px] rounded-full mb-3">
+            Edukasi &amp; Blog Terbaru
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-charcoal tracking-tight leading-tight">
+            Artikel Seputar Kesehatan Mata
+          </h2>
+          <p className="text-slate-500 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
+            Tips perawatan mata, panduan memilih frame &amp; lensa kacamata dari tim optometris Optik Kayumanis.
+          </p>
+        </div>
+        <Link
+          href="/articles"
+          className="inline-flex items-center gap-2 self-start md:self-auto px-6 py-3 rounded-full bg-obsidian text-white hover:bg-cinnamon font-bold text-xs uppercase tracking-wider transition-all shadow-md shrink-0 duration-300"
+        >
+          Lihat Semua Artikel &rarr;
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {articles.map((a) => (
+          <Link
+            key={a.id}
+            href={`/articles/${a.slug}`}
+            className="group bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition duration-300 flex flex-col"
+          >
+            {a.thumbnail ? (
+              <div className="aspect-[16/10] overflow-hidden bg-slate-100 relative">
+                <img
+                  src={a.thumbnail}
+                  alt={a.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            ) : (
+              <div className="aspect-[16/10] bg-slate-100 flex items-center justify-center text-slate-300">
+                <span className="text-4xl">👓</span>
+              </div>
+            )}
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold text-[11px] mb-2.5">
+                  {formatDate(a.publishedAt || a.createdAt)}
+                </span>
+                <h3 className="font-extrabold text-base sm:text-lg text-charcoal group-hover:text-cinnamon transition-colors line-clamp-2 leading-snug mb-2.5">
+                  {a.title}
+                </h3>
+                {a.excerpt && (
+                  <p className="text-xs sm:text-sm text-slate-500 line-clamp-3 leading-relaxed">
+                    {a.excerpt}
+                  </p>
+                )}
+              </div>
+              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-cinnamon group-hover:translate-x-1 transition-transform">
+                Baca Selengkapnya &rarr;
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomeContentSections({ content, articles }) {
   return (
     <>
       <LayananSlider section={content.layananSlider} />
       <CabangSlider section={content.cabang} ctaFromFooter={content.footer?.whatsappLink} />
+      <HomeArticlesSection articles={articles} />
       <SponsorSlider sponsors={content.sponsors} />
       <ContactSection contact={content.kontak} footer={content.footer} />
     </>
