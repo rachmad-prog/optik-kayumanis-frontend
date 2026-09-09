@@ -75,6 +75,7 @@ export default function Footer({ content }) {
             <li><Link href="/store" className="hover:text-cinnamon transition">✨ {t("store")} 2026</Link></li>
             <li><Link href="/store?category=kacamata-optik" className="hover:text-cinnamon transition">{t("opticalGlasses")}</Link></li>
             <li><Link href="/store?category=lensa-kontak" className="hover:text-cinnamon transition">{t("contactLenses")}</Link></li>
+            <li><Link href="/articles" className="hover:text-cinnamon transition">📰 Artikel & Edukasi</Link></li>
           </ul>
         </div>
 

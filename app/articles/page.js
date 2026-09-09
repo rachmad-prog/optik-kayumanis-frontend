@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { api } from "../../lib/api";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 const SITE_URL = process.env.NEXT_PUBLIC_CLIENT_URL || "https://optikkayumanis.com";
 
@@ -32,9 +32,10 @@ function formatDate(iso) {
 
 async function getArticles() {
   try {
-    const data = await api.get("/articles", null, { next: { revalidate: 60 } });
+    const data = await api.get("/articles", null, { cache: "no-store" });
     return data.items || [];
-  } catch {
+  } catch (err) {
+    console.error("[ArticlesPage] Gagal fetch artikel:", err?.message);
     return [];
   }
 }
