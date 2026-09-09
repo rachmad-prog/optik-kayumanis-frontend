@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { api } from "../lib/api";
 import HeroCarousel from "../components/HeroCarousel";
 import HomeContentSections from "../components/HomeContentSections";
@@ -26,6 +27,24 @@ async function getSiteContent() {
   } catch {
     return DEFAULT_CONTENT;
   }
+}
+
+async function getLatestArticles() {
+  try {
+    const data = await api.get("/articles?limit=3", null, { cache: "no-store" });
+    return data.items || [];
+  } catch {
+    return [];
+  }
+}
+
+function formatDate(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 // Fixed icon set matched to valueProps items by position (title/desc come from CMS)
@@ -73,7 +92,10 @@ const valuePropIcons = [
 ];
 
 export default async function HomePage() {
-  const content = await getSiteContent();
+  const [content, articles] = await Promise.all([
+    getSiteContent(),
+    getLatestArticles(),
+  ]);
 
   const { marquee, valueProps, layanan, tentang } = content;
 
@@ -247,6 +269,73 @@ export default async function HomePage() {
       </section>
 
       <HomeContentSections content={content} />
+
+      {/* Artikel & Edukasi Terbaru Section */}
+      {articles.length > 0 && (
+        <section id="artikel" className="max-w-7xl mx-auto px-5 md:px-8 py-20 border-t border-sand">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+            <div>
+              <span className="inline-block px-3 py-1 bg-champagne-100 text-champagne-700 font-extrabold uppercase tracking-widest text-[11px] rounded-full mb-3">
+                Edukasi &amp; Blog Terbaru
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-charcoal tracking-tight">
+                Artikel Seputar Kesehatan Mata
+              </h2>
+              <p className="text-slate-500 mt-2 text-sm sm:text-base">
+                Tips perawatan mata, panduan memilih frame &amp; lensa dari tim optometris Optik Kayumanis.
+              </p>
+            </div>
+            <Link
+              href="/articles"
+              className="inline-flex items-center gap-2 self-start md:self-auto px-5 py-2.5 rounded-full bg-obsidian text-white hover:bg-cinnamon font-bold text-xs uppercase tracking-wider transition-colors shadow-sm shrink-0"
+            >
+              Lihat Semua Artikel &rarr;
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((a) => (
+              <Link
+                key={a.id}
+                href={`/articles/${a.slug}`}
+                className="group bg-white border border-sand rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col"
+              >
+                {a.thumbnail ? (
+                  <div className="aspect-video overflow-hidden bg-sand/30">
+                    <img
+                      src={a.thumbnail}
+                      alt={a.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-sand/40 flex items-center justify-center text-bark-300">
+                    <span className="text-3xl">📰</span>
+                  </div>
+                )}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-cinnamon mb-2">
+                      {formatDate(a.publishedAt || a.createdAt)}
+                    </p>
+                    <h3 className="font-bold text-lg text-charcoal group-hover:text-cinnamon transition-colors line-clamp-2 leading-snug mb-2">
+                      {a.title}
+                    </h3>
+                    {a.excerpt && (
+                      <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
+                        {a.excerpt}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-sand/60 flex items-center text-xs font-bold text-cinnamon group-hover:translate-x-1 transition-transform">
+                    Baca Selengkapnya &rarr;
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }

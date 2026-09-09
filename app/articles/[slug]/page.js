@@ -1,16 +1,17 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { api } from "../../../lib/api";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 const SITE_URL = process.env.NEXT_PUBLIC_CLIENT_URL || "https://optikkayumanis.com";
 
 async function getArticle(slug) {
   try {
-    const data = await api.get(`/articles/${slug}`, null, { next: { revalidate: 60 } });
+    const data = await api.get(`/articles/${slug}`, null, { cache: "no-store" });
     return data.article;
-  } catch {
+  } catch (err) {
+    console.error("[ArticleDetail] Gagal fetch artikel:", err?.message);
     return null;
   }
 }

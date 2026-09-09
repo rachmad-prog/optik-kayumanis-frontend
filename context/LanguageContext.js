@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -29,6 +29,7 @@ const dictionaries = {
     operatingHours: "Operating Hours",
     location: "Location",
     mapLocation: "Map Location",
+    articles: "Articles",
     allRightsReserved: "All rights reserved.",
   },
   id: {
@@ -55,6 +56,7 @@ const dictionaries = {
     operatingHours: "Jam Operasional",
     location: "Lokasi",
     mapLocation: "Peta Lokasi",
+    articles: "Artikel",
     allRightsReserved: "Seluruh hak cipta dilindungi.",
   },
 };
