@@ -1,4 +1,4 @@
-// File: D:\AA\2026\PROJEK\Websiteku\optikkayumanis\frontend\app\articles\[slug]\page.js
+// File: /var/www/optikkayumanis/frontend/app/articles/[slug]/page.js
 import * as entry from '../../../../../app/articles/[slug]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
