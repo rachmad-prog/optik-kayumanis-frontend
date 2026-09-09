@@ -11,6 +11,7 @@ const mainNavLinks = [
   { href: "/#tentang", key: "about" },
   { href: "/#layanan", key: "services" },
   { href: "/#cabang", key: "branches" },
+  { href: "/articles", key: "articles" },
   { href: "/#kontak", key: "contact" },
 ];
 
