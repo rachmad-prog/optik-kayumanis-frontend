@@ -52,7 +52,7 @@ export default async function RootLayout({ children }) {
   const { metaPixelId, googleAdsId, googleAdsLabel, gtmId, gaId } = tracking;
 
   return (
-    <html lang="en" className={jakarta.variable}>
+    <html lang="id" className={jakarta.variable}>
       <body className="font-sans bg-cream text-charcoal antialiased min-h-screen flex flex-col">
         <LanguageProvider>
           <AuthProvider>
