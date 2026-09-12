@@ -4,7 +4,7 @@ import { api } from "../../../lib/api";
 
 export const dynamic = "force-dynamic";
 
-const SITE_URL = process.env.NEXT_PUBLIC_CLIENT_URL || "https://optikkayumanis.com";
+const SITE_URL = process.env.NEXT_PUBLIC_CLIENT_URL || "https://optikkayumanis.id";
 
 async function getArticle(slug) {
   try {
