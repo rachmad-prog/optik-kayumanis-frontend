@@ -18,7 +18,7 @@ export default function ProductGallery({ images = [], productName }) {
           src={active.url}
           alt={productName}
           fill
-          className="object-cover"
+          className="object-contain p-4"
           priority
         />
       </div>
@@ -37,7 +37,7 @@ export default function ProductGallery({ images = [], productName }) {
               aria-label={`Lihat gambar ${i + 1}`}
               aria-current={i === activeIndex}
             >
-              <Image src={img.url} alt={`${productName} ${i + 1}`} fill className="object-cover" />
+              <Image src={img.url} alt={`${productName} ${i + 1}`} fill className="object-contain p-1.5" />
             </button>
           ))}
         </div>
