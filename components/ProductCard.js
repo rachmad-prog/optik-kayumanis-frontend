@@ -13,12 +13,12 @@ export default function ProductCard({ product }) {
       className="group relative block bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-obsidian/10 transition-all duration-500 transform hover:-translate-y-1"
     >
       {/* Image & Badges Container */}
-      <div className="relative aspect-[4/3] bg-slate-50 overflow-hidden">
+      <div className="relative aspect-[3/2] bg-slate-50 overflow-hidden">
         <Image
           src={image}
           alt={product.name}
           fill
-          className="object-contain p-3 group-hover:scale-108 transition-transform duration-700 ease-out"
+          className="object-contain group-hover:scale-108 transition-transform duration-700 ease-out"
           sizes="(max-width: 768px) 50vw, 25vw"
         />
 
