@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 
@@ -89,13 +88,6 @@ export default function LoginForm() {
           {submitting ? "Memproses..." : "Masuk"}
         </button>
       </form>
-
-      <p className="text-sm text-bark-500 mt-6 text-center">
-        Belum punya akun?{" "}
-        <Link href="/register" className="text-cinnamon-600 font-medium">
-          Daftar di sini
-        </Link>
-      </p>
     </div>
   );
 }
