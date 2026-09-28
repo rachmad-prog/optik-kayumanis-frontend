@@ -1313,6 +1313,58 @@ export default function AdminContentPage() {
 
       {activeTab === "sliderLayanan" && (
         <div className="space-y-6">
+          {/* Keterangan layanan (di atas galeri) */}
+          <Section
+            title="Keterangan Layanan (di atas galeri foto)"
+            onSave={() =>
+              saveSection("layananInfo", { layananInfo: content.layananInfo })
+            }
+            saving={savingMap.layananInfo}
+            status={statusMap.layananInfo}>
+            <Field
+              label="Judul"
+              value={content.layananInfo.title}
+              onChange={(v) => update(["layananInfo", "title"], v)}
+              textarea
+            />
+            {content.layananInfo.items.map((item, i) => (
+              <div key={i} className="border border-sand rounded-xl p-4 mb-4">
+                <p className="text-xs font-bold uppercase text-cinnamon-500 mb-3">
+                  Layanan {i + 1}
+                </p>
+                <Field
+                  label="Nama layanan"
+                  value={item.title}
+                  onChange={(v) =>
+                    updateArrayItem(["layananInfo", "items"], i, "title", v)
+                  }
+                />
+                <Field
+                  label="Deskripsi"
+                  value={item.desc}
+                  onChange={(v) =>
+                    updateArrayItem(["layananInfo", "items"], i, "desc", v)
+                  }
+                  textarea
+                />
+                <AddRemove
+                  addLabel="Tambah Layanan"
+                  onAdd={() =>
+                    addArrayItem(["layananInfo", "items"], {
+                      title: "Layanan baru",
+                      desc: "Deskripsi layanan baru.",
+                    })
+                  }
+                  onRemove={
+                    content.layananInfo.items.length > 1
+                      ? () => removeArrayItem(["layananInfo", "items"], i)
+                      : null
+                  }
+                />
+              </div>
+            ))}
+          </Section>
+
           {/* Slider Layanan Optik Kayumanis */}
           <Section
             title="Slider Layanan Optik Kayumanis"

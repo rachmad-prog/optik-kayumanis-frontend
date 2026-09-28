@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { DEFAULT_CONTENT } from "../lib/defaultContent";
 
 function getItemImage(item) {
   return item?.image || item?.imageUrl || "";
@@ -162,7 +163,97 @@ function GalleryOverlay({ open, items, onClose, onSelect }) {
 // to zoom. Admin data/shape (section.items) is unchanged from before.
 const LAYANAN_GALLERY_LIMIT = 6;
 
-function LayananSlider({ section }) {
+// Icon set for the "Kami Menawarkan Berbagai Layanan" block, matched to items
+// by position (title/desc come from the CMS). Outline style, orange accent.
+const LAYANAN_INFO_ICONS = [
+  // Home Service
+  <path key="i1" d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10M10 19.5v-5h4v5" />,
+  // Pemeriksaan Refraksi
+  <>
+    <path key="i2a" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+    <circle key="i2b" cx="12" cy="12" r="3" />
+  </>,
+  // Pembuatan Kacamata
+  <>
+    <circle key="i3a" cx="6.5" cy="14" r="3.5" />
+    <circle key="i3b" cx="17.5" cy="14" r="3.5" />
+    <path key="i3c" d="M10 14h4M3 14 5 7M21 14l-2-7" />
+  </>,
+  // Service
+  <path
+    key="i4"
+    d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.1-.6-.6-2.1 2.4-2.4Z"
+  />,
+  // Konsultasi
+  <>
+    <path key="i5a" d="M21 11.5a8.4 8.4 0 0 1-12.2 7.5L3 20.5l1.6-5.2A8.4 8.4 0 1 1 21 11.5Z" />
+    <path key="i5b" d="M8.5 10.5h7M8.5 13.5h4.5" />
+  </>,
+];
+
+function LayananInfo({ info }) {
+  const items = info?.items || [];
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-20 md:mb-24">
+      {info?.title && (
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-obsidian tracking-tight leading-tight">
+            {info.title}
+          </h2>
+          {/* Divider dengan garis detak jantung */}
+          <svg
+            viewBox="0 0 64 16"
+            className="w-16 h-4 mx-auto mt-6 text-champagne"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M2 8h10M15 8h2M47 8h2M52 8h10" />
+            <path d="M20 8h6l3-5 5 10 3-5h6" />
+          </svg>
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-center gap-x-10 gap-y-12">
+        {items.map((item, i) => (
+          <div
+            key={`${item.title || "info"}-${i}`}
+            className="flex items-start gap-4 w-full sm:w-[calc(50%-1.25rem)] lg:w-[calc(33.333%-1.667rem)]"
+          >
+            <span className="shrink-0 w-12 h-12 flex items-center justify-center text-champagne">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-10 h-10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {LAYANAN_INFO_ICONS[i % LAYANAN_INFO_ICONS.length]}
+              </svg>
+            </span>
+            <div>
+              <h3 className="text-lg font-bold text-obsidian leading-snug">{item.title}</h3>
+              {item.desc && (
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">{item.desc}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function LayananSlider({ section, info }) {
   const items = section?.items || [];
   const [modalItem, setModalItem] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -171,6 +262,7 @@ function LayananSlider({ section }) {
 
   return (
     <section id="layanan" className="max-w-7xl mx-auto px-5 md:px-8 py-20">
+      <LayananInfo info={info} />
       <SectionHeader section={section} eyebrow="Standard Eyecare 2026" />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
@@ -533,7 +625,7 @@ function HomeArticlesSection({ articles }) {
 export default function HomeContentSections({ content, articles }) {
   return (
     <>
-      <LayananSlider section={content.layananSlider} />
+      <LayananSlider section={content.layananSlider} info={content.layananInfo || DEFAULT_CONTENT.layananInfo} />
       <CabangSlider section={content.cabang} ctaFromFooter={content.footer?.whatsappLink} />
       <HomeArticlesSection articles={articles} />
       <SponsorSlider sponsors={content.sponsors} />
