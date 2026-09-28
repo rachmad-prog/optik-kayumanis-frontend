@@ -1842,6 +1842,14 @@ export default function AdminContentPage() {
                 hint="Contoh: tiktok.com/@optikkayumanis"
               />
             </div>
+            <Field
+              label="Katalog Instagram"
+              value={content.footer.socials.katalogInstagram || ""}
+              onChange={(v) =>
+                update(["footer", "socials", "katalogInstagram"], v)
+              }
+              hint="Tombol 'Katalog Instagram' di footer. Contoh: instagram.com/katalog.optikkayumanisbogor"
+            />
 
             <p className="text-sm font-semibold text-bark-700 mb-2 mt-4">
               Lokasi Peta
