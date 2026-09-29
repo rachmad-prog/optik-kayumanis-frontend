@@ -10,6 +10,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
 
   function loadProducts() {
     setLoading(true);
@@ -24,6 +25,29 @@ export default function AdminProductsPage() {
   useEffect(() => {
     if (token) loadProducts();
   }, [token]);
+
+  async function handleToggleActive(product) {
+    if (togglingId) return;
+    const next = !product.isActive;
+    const ok = confirm(
+      next
+        ? `Aktifkan "${product.name}"? Produk akan tampil di toko.`
+        : `Nonaktifkan "${product.name}"? Produk akan disembunyikan dari toko.`
+    );
+    if (!ok) return;
+
+    setTogglingId(product.id);
+    try {
+      await api.put(`/products/${product.id}`, { isActive: next }, token);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, isActive: next } : p))
+      );
+    } catch (err) {
+      alert(err.message || "Gagal mengubah status produk.");
+    } finally {
+      setTogglingId(null);
+    }
+  }
 
   async function handleDelete(id) {
     if (!confirm("Hapus produk ini?")) return;
@@ -72,14 +96,15 @@ export default function AdminProductsPage() {
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className="border-t border-sand">
-                    <td className="px-4 py-3 text-bark-700 font-medium">{p.name}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-bark-700 font-medium">{p.name}</p>
+                      <p className="text-xs text-bark-300 font-mono mt-0.5">SKU: {p.sku || "-"}</p>
+                    </td>
                     <td className="px-4 py-3 text-bark-500">{p.category?.name}</td>
                     <td className="px-4 py-3 font-mono text-cinnamon-600">{formatRupiah(p.price)}</td>
                     <td className="px-4 py-3">{p.stock}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                        {p.isActive ? "Aktif" : "Nonaktif"}
-                      </span>
+                      <StatusToggle product={p} busy={togglingId === p.id} onToggle={handleToggleActive} />
                     </td>
                     <td className="px-4 py-3 text-right space-x-3">
                       <Link href={`/admin/products/${p.id}/edit`} className="text-cinnamon-600 hover:underline">
@@ -107,10 +132,16 @@ export default function AdminProductsPage() {
             {products.map((p) => (
               <div key={p.id} className="bg-white border border-sand rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <p className="font-medium text-bark-700">{p.name}</p>
-                  <span className={`shrink-0 text-xs px-2 py-1 rounded-full ${p.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                    {p.isActive ? "Aktif" : "Nonaktif"}
-                  </span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-bark-700">{p.name}</p>
+                    <p className="text-xs text-bark-300 font-mono mt-0.5">SKU: {p.sku || "-"}</p>
+                  </div>
+                  <StatusToggle
+                    product={p}
+                    busy={togglingId === p.id}
+                    onToggle={handleToggleActive}
+                    className="shrink-0"
+                  />
                 </div>
                 <p className="text-sm text-bark-500 mb-2">{p.category?.name}</p>
                 <div className="flex items-center justify-between text-sm mb-3">
@@ -134,5 +165,25 @@ export default function AdminProductsPage() {
         </>
       )}
     </div>
+  );
+}
+
+function StatusToggle({ product, busy, onToggle, className = "" }) {
+  const active = product.isActive;
+  return (
+    <button
+      type="button"
+      onClick={() => onToggle(product)}
+      disabled={busy}
+      title={active ? "Klik untuk nonaktifkan" : "Klik untuk aktifkan"}
+      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium transition disabled:opacity-50 disabled:cursor-wait ${
+        active
+          ? "bg-green-100 text-green-700 hover:bg-green-200"
+          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+      } ${className}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-green-500" : "bg-gray-400"}`} />
+      {busy ? "Menyimpan..." : active ? "Aktif" : "Nonaktif"}
+    </button>
   );
 }
