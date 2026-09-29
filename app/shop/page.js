@@ -5,6 +5,8 @@ import { DEFAULT_CONTENT } from "../../lib/defaultContent";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// Mengembalikan { items, error } supaya kegagalan API (mis. lisensi diblokir,
+// backend down) tidak lagi disamarkan menjadi "produk kosong".
 async function getProducts(searchParams) {
   const params = new URLSearchParams();
   if (searchParams.category) params.set("category", searchParams.category);
@@ -13,9 +15,10 @@ async function getProducts(searchParams) {
 
   try {
     const data = await api.get(`/products?${params.toString()}`, null, { cache: "no-store" });
-    return data.items || [];
-  } catch {
-    return [];
+    return { items: data.items || [], error: null };
+  } catch (err) {
+    console.error("[shop] Gagal memuat produk:", err?.message || err);
+    return { items: [], error: err?.message || "Gagal memuat produk." };
   }
 }
 
@@ -38,7 +41,7 @@ async function getContent() {
 }
 
 export default async function ShopPage({ searchParams }) {
-  const [products, categories, content] = await Promise.all([
+  const [{ items: products, error: loadError }, categories, content] = await Promise.all([
     getProducts(searchParams),
     getCategories(),
     getContent(),
@@ -51,6 +54,7 @@ export default async function ShopPage({ searchParams }) {
         categories={categories}
         currentCategory={searchParams.category}
         initialQuery={searchParams.q}
+        loadError={loadError}
         storeSlides={content?.storeSlides}
       />
     </div>

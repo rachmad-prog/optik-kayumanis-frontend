@@ -124,7 +124,7 @@ function StoreHeroBanner({ storeSlides, onOpenQuiz }) {
   );
 }
 
-export default function ShopCatalogContainer({ initialProducts, categories, currentCategory, initialQuery, storeSlides }) {
+export default function ShopCatalogContainer({ initialProducts, categories, currentCategory, initialQuery, storeSlides, loadError }) {
   const [products, setProducts] = useState(initialProducts);
   const [selectedShape, setSelectedShape] = useState("all");
   const [searchQuery, setSearchQuery] = useState(initialQuery || "");
@@ -259,7 +259,24 @@ export default function ShopCatalogContainer({ initialProducts, categories, curr
       </div>
 
       {/* Product Grid Results */}
-      {sortedProducts.length === 0 ? (
+      {loadError && products.length === 0 ? (
+        <div className="bg-white rounded-3xl p-16 text-center border border-red-100 shadow-card-modern my-10">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+            ⚠️
+          </div>
+          <h3 className="font-extrabold text-xl text-obsidian mb-2">Produk Gagal Dimuat</h3>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
+            Katalog sedang tidak dapat ditampilkan. Silakan muat ulang halaman beberapa saat lagi.
+          </p>
+          <a
+            href=""
+            className="inline-block px-6 py-2.5 bg-obsidian text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition"
+          >
+            Muat Ulang
+          </a>
+          <p className="text-[10px] text-slate-300 mt-6 font-mono">{loadError}</p>
+        </div>
+      ) : sortedProducts.length === 0 ? (
         <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-card-modern my-10">
           <div className="w-16 h-16 bg-champagne-50 text-champagne rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
             🔍

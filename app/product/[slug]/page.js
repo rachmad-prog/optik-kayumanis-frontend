@@ -9,14 +9,24 @@ export const revalidate = 0;
 async function getProduct(slug) {
   try {
     const data = await api.get(`/products/${slug}`, null, { cache: "no-store" });
-    return data.product;
-  } catch {
-    return null;
+    return { product: data.product, error: null };
+  } catch (err) {
+    console.error(`[product/${slug}] Gagal memuat produk:`, err?.message || err);
+    return { product: null, error: err?.message || "Gagal memuat produk." };
   }
 }
 
 export default async function ProductDetailPage({ params }) {
-  const product = await getProduct(params.slug);
+  const { product, error } = await getProduct(params.slug);
+  if (error && !/tidak ditemukan/i.test(error)) {
+    // Bukan 404 sungguhan (mis. 403 lisensi / backend down) -> jangan pura-pura "tidak ada".
+    return (
+      <div className="max-w-xl mx-auto px-5 py-24 text-center">
+        <h1 className="font-display text-2xl font-semibold text-bark-700 mb-3">Produk gagal dimuat</h1>
+        <p className="text-sm text-slate-500">Silakan muat ulang halaman beberapa saat lagi.</p>
+      </div>
+    );
+  }
   if (!product) return notFound();
 
   const discounted = product.compareAtPrice && product.compareAtPrice > product.price;
